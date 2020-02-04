@@ -1,0 +1,67 @@
+﻿using System;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using Elastic.Apm;
+using Elastic.Apm.Api;
+using ProcessMonitoring;
+using Windows.Apm.Client;
+using Windows.Apm.Client.Nlog;
+using WMS_Infrastructure.Instrumentation;
+
+namespace WindowsFormsClient
+{
+	public partial class Form1 : Form
+	{
+		public Form1()
+		{
+			InitializeComponent();
+		}
+
+		private void Form1_Load(object sender, EventArgs e)
+		{
+			//NetworkPerformanceReporter.Create();
+			FormsApmConfigurer.UseApm();
+			Console.WriteLine("starting...");
+			WmiCounters.EnabledInterfaces.Count();
+
+			var transaction2 = Agent.Tracer.StartTransaction("Transaction2", "TestTransaction", DistributedTracingData.TryDeserializeFromString("somedata"));
+
+			try
+			{
+				//Task.Run(() => WmiCounters.GetNetworkUtilization(WmiCounters.EnabledInterfaces.First().Key, WmiCounters.EnabledInterfaces.First().Value));
+
+
+
+				transaction2.CaptureSpan("TestSpan", "TestSpanType", () => Task.Run(() =>
+				{
+					Thread.Sleep(500);
+					//var s = "a";
+					//for (var i = 0; i < 100000000; i++)
+					//{
+					//	s += "b";
+					//}
+					Console.WriteLine("OUT");
+				}));
+			}
+			finally
+			{
+				transaction2.End();
+			}
+		}
+
+		private void BtnException_Click(object sender, EventArgs e)
+				=> ApmLogger.LogExceptionToApm(new InvalidOperationException(TxtExceptionMessage.Text.Replace("{datetime}", DateTime.Now.ToString())), "excecption");
+
+		private void BtnLog_Click(object sender, EventArgs e)
+			=> ApmLogger.LogTraceToApm(TxtLogMessage.Text.Replace("{datetime}", DateTime.Now.ToString()));
+
+		private void BtnNlog_Click(object sender, EventArgs e)
+			=> Logger.Instance.Debug(TxtNLog.Text.Replace("{datetime}", DateTime.Now.ToString()));
+
+		private void BtnExcepcionNLOG_Click(object sender, EventArgs e)
+			=> Logger.Instance.Error(TxtExcepcionNLOG.Text.Replace("{datetime}", DateTime.Now.ToString()),
+				new InvalidOperationException(TxtExcepcionNLOG.Text.Replace("{datetime}", DateTime.Now.ToString())));
+	}
+}
