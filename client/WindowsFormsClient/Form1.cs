@@ -22,9 +22,6 @@ namespace WindowsFormsClient
 		private void Form1_Load(object sender, EventArgs e)
 		{
 			//NetworkPerformanceReporter.Create();
-			FormsApmConfigurer.UseApm();
-			Console.WriteLine("starting...");
-			WmiCounters.EnabledInterfaces.Count();
 
 			var transaction2 = Agent.Tracer.StartTransaction("Transaction2", "TestTransaction", DistributedTracingData.TryDeserializeFromString("somedata"));
 

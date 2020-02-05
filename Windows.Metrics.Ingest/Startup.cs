@@ -10,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Windows.Metrics.Ingest.Data;
 
 namespace Windows.Metrics.Ingest
 {
@@ -28,6 +29,8 @@ namespace Windows.Metrics.Ingest
 			services
 				.AddControllers()
 				.AddNewtonsoftJson();
+
+			services.AddScoped<MetricCrud>();
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

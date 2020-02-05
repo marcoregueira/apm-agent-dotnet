@@ -48,11 +48,10 @@ namespace AspNetFullFrameworkSampleApp
 		{
 			if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 			{
-
 				var counter = WmiCounters.GetOneInterface();
 				return new List<MetricSample> {
-					 new MetricSample(NetworkOut, counter.SendSum),
-					 new MetricSample(NetworkIn, counter.ReceiveSum)
+					 new MetricSample(NetworkOut, counter.SentSum),
+					 new MetricSample(NetworkIn, counter.ReceivedSum)
 					 //new MetricSample(NetworkName, counter.NetworkInterface),
 				};
 			}

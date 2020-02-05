@@ -58,7 +58,7 @@ namespace Windows.Apm.Client.Nlog
 		[JsonConverter(typeof(TrimmedStringJsonConverter))]
 		public string Culprit { get; set; }
 
-		[JsonConverter(typeof(TrimmedStringJsonConverter))]
+		//[JsonConverter(typeof(TrimmedStringJsonConverter))]
 		public string Message { get; set; }
 
 		[JsonConverter(typeof(TrimmedStringJsonConverter))]

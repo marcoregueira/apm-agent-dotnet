@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Net.Mime;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -15,16 +12,13 @@ namespace Windows.Metrics.Ingest.Controllers
 	[Route("[controller]/v2")]
 	public class IntakeController : ControllerBase
 	{
-		private static readonly string[] Summaries = new[]
-		{
-			"Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-		};
-
 		private readonly ILogger<IntakeController> _logger;
+		public MetricCrud Crud { get; }
 
-		public IntakeController(ILogger<IntakeController> logger)
+		public IntakeController(ILogger<IntakeController> logger, MetricCrud crud)
 		{
 			_logger = logger;
+			Crud = crud;
 		}
 
 
@@ -58,7 +52,7 @@ namespace Windows.Metrics.Ingest.Controllers
 					time = metricset.Metricset.Timestamp;
 
 					var dataDb = new MetricData() { Time = time, Host = metadata?.Metadata?.System.HostName, Metrics = JsonConvert.SerializeObject(metricValues) };
-					MetricCrud.Insert(dataDb);
+					Crud.Insert(dataDb);
 					continue;
 				}
 
@@ -80,7 +74,7 @@ namespace Windows.Metrics.Ingest.Controllers
 						ErrorId = errorInfo.Id,
 					};
 
-					MetricCrud.Insert(dataDb);
+					Crud.Insert(dataDb);
 					continue;
 				}
 
@@ -102,7 +96,7 @@ namespace Windows.Metrics.Ingest.Controllers
 						LogId = errorInfo.Id
 					};
 
-					MetricCrud.Insert(dataDb);
+					Crud.Insert(dataDb);
 					continue;
 				}
 			}

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,6 +12,9 @@ using Elastic.Apm.Helpers;
 using Elastic.Apm.Logging;
 using Elastic.Apm.Metrics;
 using Elastic.Apm.Report;
+using NLog;
+using NLog.Layouts;
+using NLog.Targets;
 
 namespace Windows.Apm.Client
 {
@@ -31,7 +35,7 @@ namespace Windows.Apm.Client
 
 			var collector = new MetricsCollector(logger, sender, configurationReader);
 
-			collector.MetricsProviders.Add(new NetworkMetricProvider());
+			collector.MetricsProviders?.Add(new NetworkMetricProvider());
 
 			var components = new AgentComponents(
 				logger: logger,
@@ -41,7 +45,32 @@ namespace Windows.Apm.Client
 				currentExecutionSegmentsContainer: null,
 				centralConfigFetcher: new LocalConfigFetcher());
 
-   Agent.Setup(components);
+			Agent.Setup(components);
+		}
+
+		public static void SetLoggerTargetFolder(string path)
+		{
+			var canSave = false;
+			try
+			{
+				if (Directory.Exists(path))
+				{
+					var test = Guid.NewGuid().ToString().Substring(4) + ".lck";
+					var testFile = Path.Combine(path, test);
+					File.WriteAllText(testFile, "<test>");
+					File.Delete(testFile);
+					canSave = true;
+				}
+			}
+			catch { /* nothing to do */ }
+
+			if (canSave)
+			{
+				var target = (FileTarget)LogManager.Configuration.FindTargetByName("file");
+				var currentTarget = ((SimpleLayout)target.FileName).OriginalText.Split('/').Last();
+				target.FileName = Path.Combine(path, currentTarget);
+				LogManager.ReconfigExistingLoggers();
+			}
 		}
 	}
 }

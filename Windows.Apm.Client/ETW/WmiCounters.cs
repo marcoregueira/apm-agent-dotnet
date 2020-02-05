@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Net.NetworkInformation;
+using System.Text;
 using System.Threading;
 using Elastic.Apm;
+using Windows.Apm.Client.Nlog;
 
 /// <summary>
 /// CREDIT TO:
@@ -16,77 +18,93 @@ namespace ProcessMonitoring
 	public static class WmiCounters
 
 	{
-		public static Dictionary<string, NetworkInterface> EnabledInterfaces { get; set; } = new Dictionary<string, NetworkInterface>();
+		private static PerformanceCounter _networkCounter = null;
+		private static NetworkInterface _nic;
 
 		static WmiCounters()
 		{
-			//EnabledInterfaces = NetworkInterface.GetAllNetworkInterfaces().ToDictionary(x => x.Name);
 
-			EnabledInterfaces = NetworkInterface.GetAllNetworkInterfaces()
+		}
+
+		public static void LogInterfaceNames()
+		{
+			var enabledInterfaces = NetworkInterface.GetAllNetworkInterfaces()
 				.Where(x => x.OperationalStatus == System.Net.NetworkInformation.OperationalStatus.Up)
 				.OrderByDescending(x => x.GetIPStatistics().BytesReceived)
-				.Take(1)
-				//.Where(x => x.Description.Contains("Athero"))
-				.ToDictionary(x => x.Description);
+				.ToList();
+
+			var b = new StringBuilder();
+			b.AppendLine("NETWORK INTERFACES");
+			b.AppendLine("==================");
+
+			foreach (var nic in enabledInterfaces)
+			{
+				b.AppendLine($"{nic.Description} || {nic.Name}");
+			}
+			Logger.Instance.Debug(b.ToString());
+		}
+
+		public static void EnableNetworkCounter(string nicName = null)
+		{
+			//EnabledInterfaces = NetworkInterface.GetAllNetworkInterfaces().ToDictionary(x => x.Name);
+			_networkCounter?.Dispose();
+
+			var enabledInterfaces = NetworkInterface.GetAllNetworkInterfaces()
+				.Where(x => x.OperationalStatus == System.Net.NetworkInformation.OperationalStatus.Up)
+				.Where(x => x.Description == nicName || string.IsNullOrWhiteSpace(nicName))
+				.OrderByDescending(x => x.GetIPStatistics().BytesReceived)
+				.ToList();
+
+			foreach (var nic in enabledInterfaces)
+			{
+				PerformanceCounter bwc = null;
+				try
+				{
+					bwc = new PerformanceCounter("Network Interface", "Current Bandwidth", nic.Description);
+					_ = bwc.NextValue();
+					_nic = nic;
+					_networkCounter = bwc;
+
+					Logger.Instance.Debug("Obteniendo métricas de la tarjeta: " + _nic.Description);
+
+					break; //we only want one of those
+				}
+				catch
+				{
+					bwc?.Dispose();
+				}
+			}
 		}
 
 		public static NetworkMetrics GetOneInterface() =>
-			GetNetworkUtilization(EnabledInterfaces.FirstOrDefault().Key, EnabledInterfaces.FirstOrDefault().Value);
+			GetNetworkUtilization();
 
-		public static NetworkMetrics GetNetworkUtilization(string networkCard, NetworkInterface networkInterface)
+		public static NetworkMetrics GetNetworkUtilization()
 		{
-			//var n = System.Net.NetworkInformation.NetworkInterface.GetAllNetworkInterfaces().First();
+			if (_nic == null) return null;
+			if (_networkCounter == null) return null;
 
-			//var dataSentCounter =
-			//	new PerformanceCounter("Network Interface", "Bytes Sent/sec", networkCard);
-			//var dataReceivedCounter =
-			//	new PerformanceCounter("Network Interface", "Bytes Received/sec", networkCard);
-
-			float sendSum = 0;
-			float receiveSum = 0;
-			//for (var index = 0; index < numberOfIterations; index++)
-			//{
-			//	sendSum += dataSentCounter.NextValue();
-			//	receiveSum += dataReceivedCounter.NextValue();
-			//}
-
-			var bandwidthCounter = new PerformanceCounter("Network Interface", "Current Bandwidth", networkCard);
-			var bandwidth = bandwidthCounter.NextValue();
-
-
-
-			sendSum = networkInterface.GetIPStatistics().BytesSent;
-			receiveSum = networkInterface.GetIPStatistics().BytesReceived;
+			var sendSum = _nic.GetIPStatistics().BytesSent;
+			var receiveSum = _nic.GetIPStatistics().BytesReceived;
 			return new NetworkMetrics(sendSum, receiveSum)
 			{
-				NetworkInterface = networkInterface.Name,
-				Card = networkCard,
-
+				NetworkInterface = _nic.Description,
+				Card = _nic.Name,
 			};
-
-			//Console.WriteLine(sendSum.ToString("0.00"));
-			//Console.WriteLine(receiveSum.ToString("0.00"));
-
-			//Agent.Instance.Logger.Log<NewClass>(Elastic.Apm.Logging.LogLevel.Information, new NewClass(sendSum, receiveSum), null, null);
-
-			// var dataSent = sendSum;
-			// var dataReceived = receiveSum;
-			// //double utilization = (8 * (dataSent + dataReceived)) / (bandwidth * numberOfIterations) * 100;
-			//return utilization;
 		}
 	}
 
 	public class NetworkMetrics
 	{
-		public float SendSum { get; }
-		public float ReceiveSum { get; }
+		public float SentSum { get; }
+		public float ReceivedSum { get; }
 		public string NetworkInterface { get; internal set; }
 		public string Card { get; internal set; }
 
-		public NetworkMetrics(float sendSum, float receiveSum)
+		public NetworkMetrics(float sentSum, float receiveSum)
 		{
-			SendSum = sendSum;
-			ReceiveSum = receiveSum;
+			SentSum = sentSum;
+			ReceivedSum = receiveSum;
 		}
 	}
 }

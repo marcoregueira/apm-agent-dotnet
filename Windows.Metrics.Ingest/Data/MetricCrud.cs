@@ -1,11 +1,22 @@
 ﻿using Dapper;
+using Microsoft.Extensions.Configuration;
 using Npgsql;
 
 namespace Windows.Metrics.Ingest.Data
 {
-	public static class MetricCrud
+	public class MetricCrud
 	{
-		public static void Insert(MetricData data)
+		public IConfiguration Configuration { get; }
+
+		private readonly string _connectionString;
+
+		public MetricCrud(IConfiguration configuration)
+		{
+			Configuration = configuration;
+			_connectionString = Configuration.GetConnectionString("default");
+		}
+
+		public void Insert(MetricData data)
 		{
 			/*
 				-- Table: public.metrics
@@ -23,7 +34,8 @@ namespace Windows.Metrics.Ingest.Data
 				OWNER TO postgres;
 			 */
 
-			using (var connection = new NpgsqlConnection("Host=vmware.localhost.com;Username=postgres;Password=listas;Database=metrics"))
+
+			using (var connection = new NpgsqlConnection(_connectionString))
 			{
 				connection.Open();
 				connection.Execute("Insert into public.metrics (time, host, data) values (@time, @host, CAST(@metrics AS json));", data);
@@ -32,7 +44,7 @@ namespace Windows.Metrics.Ingest.Data
 			}
 		}
 
-		public static void Insert(ErrorData data)
+		public void Insert(ErrorData data)
 		{
 			/*
 
@@ -53,7 +65,7 @@ namespace Windows.Metrics.Ingest.Data
 
 			 */
 
-			using (var connection = new NpgsqlConnection("Host=vmware.localhost.com;Username=postgres;Password=listas;Database=metrics"))
+			using (var connection = new NpgsqlConnection(_connectionString))
 			{
 				connection.Open();
 				connection.Execute(@"
@@ -66,7 +78,7 @@ namespace Windows.Metrics.Ingest.Data
 			}
 		}
 
-		public static void Insert(LogData data)
+		public  void Insert(LogData data)
 		{
 			/*
 
@@ -87,7 +99,7 @@ namespace Windows.Metrics.Ingest.Data
 
 			 */
 
-			using (var connection = new NpgsqlConnection("Host=vmware.localhost.com;Username=postgres;Password=listas;Database=metrics"))
+			using (var connection = new NpgsqlConnection(_connectionString))
 			{
 				connection.Open();
 				connection.Execute(@"
