@@ -38,6 +38,7 @@
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -48,6 +49,7 @@
   <ItemGroup>
     <Compile Include="AgentDependencies.cs" />
     <Compile Include="ApmLoggerToNLog.cs" />
+    <Compile Include="ElasticApmModule.cs" />
     <Compile Include="ETW\EtwNetworkPerformanceReporter.cs" />
     <Compile Include="ETW\WmiCounters.cs" />
     <Compile Include="LocalConfigFetcher.cs" />
@@ -63,6 +65,12 @@
     <Compile Include="PayloadItemSerializer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Tracer\ApmLogger.cs" />
+    <Compile Include="Tracer\ApmLoggerHttpModule.cs" />
+    <Compile Include="Tracer\ApmLoggerForms.cs" />
+    <Compile Include="Tracer\HttpRequestExtensions.cs" />
+    <Compile Include="Tracer\Traces\AutoFinishingSpan.cs" />
+    <Compile Include="Tracer\Traces\ExecutionSegment.cs" />
+    <Compile Include="Tracer\IApmLogger1.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\src\Elastic.Apm\Elastic.Apm.csproj">

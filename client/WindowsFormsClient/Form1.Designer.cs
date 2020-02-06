@@ -40,6 +40,7 @@
             this.TxtExcepcionNLOG = new System.Windows.Forms.TextBox();
             this.BtnExcepcionNLOG = new System.Windows.Forms.Button();
             this.label4 = new System.Windows.Forms.Label();
+            this.button1 = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // TxtLogMessage
@@ -137,7 +138,7 @@
             this.BtnExcepcionNLOG.Name = "BtnExcepcionNLOG";
             this.BtnExcepcionNLOG.Size = new System.Drawing.Size(127, 23);
             this.BtnExcepcionNLOG.TabIndex = 4;
-            this.BtnExcepcionNLOG.Text = "Guardar excepción";
+            this.BtnExcepcionNLOG.Text = "Guardar except. NLOG";
             this.BtnExcepcionNLOG.UseVisualStyleBackColor = true;
             this.BtnExcepcionNLOG.Click += new System.EventHandler(this.BtnExcepcionNLOG_Click);
             // 
@@ -146,17 +147,28 @@
             this.label4.AutoSize = true;
             this.label4.Location = new System.Drawing.Point(67, 229);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(57, 13);
+            this.label4.Size = new System.Drawing.Size(90, 13);
             this.label4.TabIndex = 5;
-            this.label4.Text = "Excepción";
+            this.label4.Text = "Excepción NLOG";
+            // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(260, 325);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(127, 23);
+            this.button1.TabIndex = 4;
+            this.button1.Text = "Traza";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(879, 294);
+            this.ClientSize = new System.Drawing.Size(879, 413);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.label2);
+            this.Controls.Add(this.button1);
             this.Controls.Add(this.BtnExcepcionNLOG);
             this.Controls.Add(this.BtnException);
             this.Controls.Add(this.TxtExcepcionNLOG);
@@ -188,6 +200,7 @@
 		private System.Windows.Forms.TextBox TxtExcepcionNLOG;
 		private System.Windows.Forms.Button BtnExcepcionNLOG;
 		private System.Windows.Forms.Label label4;
+		private System.Windows.Forms.Button button1;
 	}
 }
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Elastic.Apm.Api;
 using NLog;
 using NLog.Common;
 using NLog.Targets;
@@ -15,14 +16,23 @@ namespace Windows.Apm.Client.Nlog
 	{
 		protected override void Write(LogEventInfo logEvent)
 		{
-			if (logEvent.Exception != null)
+			var logMessage = Layout.Render(logEvent);
+			if (logEvent.Exception != null && ApmLogger.Default.CurrentTransaction() == null)
 			{
-				ApmLogger.LogExceptionToApm(logEvent.Exception, logEvent.Message ?? logEvent.Exception.Message);
+				using (var trans = ApmLogger.Default.InitTrasaction("ErrorReport", "LogicGroup"))
+				{
+					ApmLogger.Default.LogTraceToApm(logMessage, level: logEvent.Level.ToString());
+					ApmLogger.Default.LogExceptionToApm(logEvent.Exception, logEvent.Message ?? logEvent.Exception.Message);
+				}
+				return;
 			}
 
-			var logMessage = Layout.Render(logEvent);
-			ApmLogger.LogTraceToApm(logMessage, level: logEvent.Level.ToString());
-			var logProperties = GetAllProperties(logEvent);
+			if (logEvent.Exception != null)
+			{
+				ApmLogger.Default.LogExceptionToApm(logEvent.Exception, logEvent.Message ?? logEvent.Exception.Message);
+			}
+			ApmLogger.Default.LogTraceToApm(logMessage, level: logEvent.Level.ToString());
+			//var logProperties = GetAllProperties(logEvent);
 		}
 	}
 }

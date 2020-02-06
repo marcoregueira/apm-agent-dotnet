@@ -238,7 +238,8 @@ namespace Elastic.Apm.Report
 
 				var val = ndjson.ToString();
 				val = JsonConvert.SerializeObject(val);
-				var content = new StringContent(val, Encoding.UTF8, "application/json");
+
+				var content = new StringContent(ndjson.ToString(), Encoding.UTF8, "application/x-ndjson");
 
 				_logger?.Debug()
 					?.Log(ndjson.ToString());

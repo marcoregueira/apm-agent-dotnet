@@ -1,5 +1,7 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -9,7 +11,6 @@ using Windows.Metrics.Ingest.Dto;
 namespace Windows.Metrics.Ingest.Controllers
 {
 	[ApiController]
-	[Route("[controller]/v2")]
 	public class IntakeController : ControllerBase
 	{
 		private readonly ILogger<IntakeController> _logger;
@@ -22,10 +23,25 @@ namespace Windows.Metrics.Ingest.Controllers
 		}
 
 
-		[HttpPost("events")]
-		//[Consumes("application/x-ndjson")]
-		public IActionResult Post([FromBody]string package)
+
+		[HttpPost("/{index}/_doc")]
+		[HttpPost("/{index}/_doc/id")]
+		[HttpPost("/{index}/_create")]
+		[HttpPost("/{index}/_create/{id}")]
+		public async Task<IActionResult> PostDocument([FromRoute]string index, [FromRoute] string id)
 		{
+			var reader = new StreamReader(HttpContext.Request.Body);
+			var package = await reader.ReadToEndAsync() ?? "";
+			if (!package.StartsWith("{")) return BadRequest();
+			return Ok();
+		}
+
+		[HttpPost("/intake/v2/events")]
+		[Consumes("application/x-ndjson")]
+		public async Task<IActionResult> PostAsync()
+		{
+			var reader = new StreamReader(HttpContext.Request.Body);
+			var package = await reader.ReadToEndAsync() ?? "";
 			if (!package.StartsWith("{")) return BadRequest();
 
 			MetaDataDto metadata = null;
@@ -55,10 +71,9 @@ namespace Windows.Metrics.Ingest.Controllers
 					Crud.Insert(dataDb);
 					continue;
 				}
-
+				else
 				if (part.StartsWith("{\"error\":"))
 				{
-
 					var errorSet = JsonConvert.DeserializeObject<ErrorsetDto>(part, new MyDateTimeConverter());
 					var errorDetailsJson = errorSet.Error.ToString();
 					var errorInfo = JsonConvert.DeserializeObject<ErrorsetDto.ErrorDtoInternal>(errorDetailsJson, new MyDateTimeConverter());
@@ -77,12 +92,14 @@ namespace Windows.Metrics.Ingest.Controllers
 					Crud.Insert(dataDb);
 					continue;
 				}
-
+				else
 				if (part.StartsWith("{\"log\":"))
 				{
 					var errorSet = JsonConvert.DeserializeObject<LogDto>(part, new MyDateTimeConverter());
 					var errorDetailsJson = errorSet.LogInfo?.ToString();
 					var errorInfo = errorSet.Log; //JsonConvert.DeserializeObject<LogDto.LogDtoInternal>(errorDetailsJson, new MyDateTimeConverter());
+					time = errorInfo.Timestamp;
+
 					var dataDb = new LogData()
 					{
 						Time = time,
@@ -99,10 +116,53 @@ namespace Windows.Metrics.Ingest.Controllers
 					Crud.Insert(dataDb);
 					continue;
 				}
+				else
+				{
+					Console.WriteLine(part);
+				}
 			}
 
 			return Ok();
 		}
+
+		[Route("/")]
+		public IActionResult Root() => Ok(
+			   new
+			   {
+				   name = "localhost",
+				   cluster_name = "elasticsearch",
+				   cluster_uuid = "DoZwos0YR26WsHSZYO4O2A",
+				   version = new
+				   {
+					   number = "7.2.0",
+					   build_flavor = "default",
+					   build_type = "tar",
+					   build_hash = "508c38a",
+					   build_date = "2019-06-20T15:54:18.811730Z",
+					   build_snapshot = false,
+					   lucene_version = "8.0.0",
+					   minimum_wire_compatibility_version = "6.8.0",
+					   minimum_index_compatibility_version = "6.0.0-beta1"
+				   },
+				   tagline = "You Know, for Search"
+			   });
+
+		[Route("/_xpack")]
+		public IActionResult Xpack() => BadRequest();
+
+		[Route("/_template")]
+		[Route("/_template/{tmpl}")]
+		public IActionResult Template() => Ok(new { });
+
+		[Route("/_bulk")]
+		[Route("/{index}/_bulk")]
+		public IActionResult Bulk()
+		{
+			var reader = new StreamReader(HttpContext.Request.Body);
+			var package = reader.ReadToEndAsync().Result ?? "";
+			return Ok(new { });
+		}
+
 	}
 
 	public class MyDateTimeConverter : Newtonsoft.Json.JsonConverter

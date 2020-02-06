@@ -19,8 +19,8 @@ namespace WindowsFormsClient
 		static void Main()
 		{
 			//Registrar nuestro conector APM en NLOG
-			FormsApmConfigurer.SetLoggerTargetFolder("c:/temp");
 			Target.Register<NLogApmTarget>("apm");
+			FormsApmConfigurer.SetLoggerTargetFolder("c:/temp");
 			FormsApmConfigurer.UseApm();
 
 			WmiCounters.LogInterfaceNames();
