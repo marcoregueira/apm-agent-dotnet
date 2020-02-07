@@ -5,16 +5,14 @@
     <PackageId>Ego.ApmAgent.Client</PackageId>
     <Authors>Marco Regueira</Authors>
     <Product>Ego.ApmAgent.Client</Product>
-    <Description>This is a ElasticSearch Apm Client with some minor changes and customizations compiled for net61
-License Apache 2.0
-</Description>
+    <Description>
+      This is a ElasticSearch Apm Client with some minor changes and customizations compiled for net61
+      License Apache 2.0
+    </Description>
     <SignAssembly>false</SignAssembly>
     <Version>1.0.0-alpha</Version>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='NuGet|net461|AnyCPU'">
-    <OutputPath>bin\NuGet\</OutputPath>
-    <WarningLevel>3</WarningLevel>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="NLog" Version="4.6.8" />
