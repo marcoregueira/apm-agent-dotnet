@@ -2,10 +2,10 @@
   <PropertyGroup>
     <TargetFrameworks>net461</TargetFrameworks>
     <Configurations>Debug;Release;NuGet</Configurations>
-    <PackageId>Windows.Apm.Client.Ego</PackageId>
+    <PackageId>Ego.ApmAgent.Client</PackageId>
     <Authors>Marco Regueira</Authors>
-    <Product>Windows.Apm.Client.Ego</Product>
-    <Description>This is a ElasticSearch Apm Client with some minor changes and customizations.
+    <Product>Ego.ApmAgent.Client</Product>
+    <Description>This is a ElasticSearch Apm Client with some minor changes and customizations compiled for net61
 License Apache 2.0
 </Description>
     <SignAssembly>false</SignAssembly>
