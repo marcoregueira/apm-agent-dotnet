@@ -10,6 +10,11 @@ License Apache 2.0
 </Description>
     <SignAssembly>false</SignAssembly>
     <Version>1.0.0-alpha</Version>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='NuGet|net461|AnyCPU'">
+    <OutputPath>bin\NuGet\</OutputPath>
+    <WarningLevel>3</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="NLog" Version="4.6.8" />
