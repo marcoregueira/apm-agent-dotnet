@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using AspNetFullFrameworkSampleApp;
 using Elastic.Apm;
 using Elastic.Apm.Api;
 using Elastic.Apm.Config;
@@ -15,6 +14,7 @@ using Elastic.Apm.Report;
 using NLog;
 using NLog.Layouts;
 using NLog.Targets;
+using Windows.Apm.Client.Metrics;
 
 namespace Windows.Apm.Client
 {
@@ -36,6 +36,7 @@ namespace Windows.Apm.Client
 			var collector = new MetricsCollector(logger, sender, configurationReader);
 
 			collector.MetricsProviders?.Add(new NetworkMetricProvider());
+			collector.MetricsProviders?.Add(new DiskUsageProvider(drive: "C:"));
 
 			var components = new AgentComponents(
 				logger: logger,

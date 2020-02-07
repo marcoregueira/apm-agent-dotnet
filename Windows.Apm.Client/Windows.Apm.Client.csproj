@@ -57,7 +57,8 @@
     <Compile Include="LocalConfigurationReader.cs" />
     <Compile Include="LocalPayloadSenderV2.cs" />
     <Compile Include="LoggingConfig.cs" />
-    <Compile Include="NetworkMetricProvider.cs" />
+    <Compile Include="Metrics\DiskUsageProvider.cs" />
+    <Compile Include="Metrics\NetworkMetricProvider.cs" />
     <Compile Include="Nlog\ILogger.cs" />
     <Compile Include="Nlog\Log.cs" />
     <Compile Include="Nlog\LogEntry.cs" />

@@ -5,7 +5,7 @@ using Elastic.Apm.Logging;
 using Elastic.Apm.Metrics;
 using ProcessMonitoring;
 
-namespace AspNetFullFrameworkSampleApp
+namespace Windows.Apm.Client.Metrics
 {
 	public class NetworkMetricProvider : IMetricsProvider
 	{
@@ -19,8 +19,10 @@ namespace AspNetFullFrameworkSampleApp
 		public int ConsecutiveNumberOfFailedReads { get; set; }
 		public string DbgName => "custom network traffic";
 
-		public NetworkMetricProvider()
+		public NetworkMetricProvider(IApmLogger logger = null)
 		{
+			_logger = logger;
+
 			if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 			{
 				//try
