@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <SignAssembly>false</SignAssembly>
+    <Configurations>Debug;Release;NuGet</Configurations>
   </PropertyGroup>
 
   <ItemGroup>

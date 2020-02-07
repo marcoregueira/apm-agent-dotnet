@@ -7,6 +7,7 @@
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
     <IntermediateOutputPath>$(ProjectDir)</IntermediateOutputPath>
+    <Configurations>Debug;Release;NuGet</Configurations>
   </PropertyGroup>
   <ItemGroup>
     <None Include="../Jenkinsfile" />

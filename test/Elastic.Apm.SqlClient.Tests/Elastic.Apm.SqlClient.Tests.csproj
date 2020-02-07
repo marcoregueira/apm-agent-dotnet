@@ -4,6 +4,7 @@
     <TargetFramework>netcoreapp2.1</TargetFramework>
     <RootNamespace>Elastic.Apm.SqlClient.Tests</RootNamespace>
     <AssemblyName>Elastic.Apm.SqlClient.Tests</AssemblyName>
+    <Configurations>Debug;Release;NuGet</Configurations>
   </PropertyGroup>
 
   <ItemGroup>

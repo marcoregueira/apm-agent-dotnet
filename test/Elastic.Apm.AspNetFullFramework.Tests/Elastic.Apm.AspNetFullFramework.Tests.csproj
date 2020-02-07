@@ -3,6 +3,7 @@
     <TargetFramework>netcoreapp2.1</TargetFramework>
     <AssemblyName>Elastic.Apm.AspNetFullFramework.Tests</AssemblyName>
     <RootNamespace>Elastic.Apm.AspNetFullFramework.Tests</RootNamespace>
+    <Configurations>Debug;Release;NuGet</Configurations>
   </PropertyGroup>
   <ItemGroup Condition="'$(OS)' == 'WINDOWS_NT'">
     <PackageReference Include="Microsoft.AspNetCore.App" />
