@@ -8,7 +8,7 @@
     <AssemblyName>Elastic.Apm</AssemblyName>
     <SignAssembly>false</SignAssembly>
     <PackageId>Ego.Apm.Agent</PackageId>
-    <Version>1.0.0-alpha</Version>
+    <Version>1.2.1-alpha</Version>
     <Description>Custom Elastic Apm Agent with minor changes
 Apache 2.0</Description>
     <Company />
