@@ -18,30 +18,29 @@ namespace WMS_Infrastructure.Instrumentation
 {
 	public class ApmLoggerHttpModule : IDisposable, IApmLogger, IHttpModule
 	{
-
-
 		private bool Disposed { get; set; }
 
 		public static string ApplicationName { get; } = AppDomain.CurrentDomain.FriendlyName;
 
 		public bool IsEnabled { get; set; } = true;
 
-		public ApmLoggerHttpModule()
-		{
-
-		}
+		public ApmLoggerHttpModule() { }
 
 		public void Dispose()
 		{
 			if (Disposed) return;
 		}
 
+		public ExecutionSegment GetCurrentTransaction() => HttpContext.Current.Items["__APM_TRANSACTION"] as ExecutionSegment;
+		private void SetCurrentTransaction(ExecutionSegment trace) => HttpContext.Current.Items["__APM_TRANSACTION"] = trace;
+		private void SetCurrentSpan(AutoFinishingSpan transaction) => HttpContext.Current.Items["__APM_TRANSACTION_SPAN"] = transaction;
+		private AutoFinishingSpan GetCurrentSpan() => HttpContext.Current.Items["__APM_TRANSACTION_SPAN"] as AutoFinishingSpan;
+
+
 		public AutoFinishingSpan InitTrasaction(string name, string type, bool getSpan = false)
 		{
 			if (!IsEnabled) return new AutoFinishingSpan(null);
-
-			var httpApps = HttpContext.Current.ApplicationInstance;
-			var trace = HttpContext.Current.Items["__APM_TRANSACTION"] as ExecutionSegment;
+			var trace = GetCurrentTransaction();
 
 			ITransaction transaction = null;
 			if (trace == null)
@@ -51,14 +50,11 @@ namespace WMS_Infrastructure.Instrumentation
 				{
 					ImplicitSpan = getSpan
 				};
-				HttpContext.Current.Items["__APM_TRANSACTION"] = trace;
+				SetCurrentTransaction(trace);
 
 				//if (!getSpan)
-				return new AutoFinishingSpan(transaction, onFinish:
-					() =>
-					{
-						HttpContext.Current.Items["__APM_TRANSACTION"] = null;
-					});
+				return new AutoFinishingSpan(transaction,
+					onFinish: () => SetCurrentTransaction(null));
 			}
 
 			var currentSegment = trace.Spans.LastOrDefault() ?? trace.CurrentTransaction as IExecutionSegment;
@@ -75,6 +71,7 @@ namespace WMS_Infrastructure.Instrumentation
 				}
 			});
 		}
+
 
 
 		private void FinishCommand(DbCommand command, ISpan newSpan, Stopwatch stop)
@@ -130,7 +127,7 @@ namespace WMS_Infrastructure.Instrumentation
 		private ISpan GetSpan(DbCommand command)
 		{
 
-			var transaction = CurrentTransaction().CurrentTransaction ?? InitTrasaction(command.CommandText, ApiConstants.TypeDb).Span;
+			var transaction = GetCurrentTransaction().CurrentTransaction ?? InitTrasaction(command.CommandText, ApiConstants.TypeDb).Span;
 			return transaction.StartSpan(command.CommandText, ApiConstants.TypeDb);
 			//var _tracer = Agent.Tracer;
 			//var currentExecutionSegment = _tracer.CurrentSpan ?? (IExecutionSegment)_tracer.CurrentTransaction;
@@ -138,7 +135,6 @@ namespace WMS_Infrastructure.Instrumentation
 			//return newSpan;
 		}
 
-		public ExecutionSegment CurrentTransaction() => HttpContext.Current.Items["__APM_TRANSACTION"] as ExecutionSegment;
 
 		public void Log(string log)
 		{
@@ -186,7 +182,7 @@ namespace WMS_Infrastructure.Instrumentation
 				parentId: null,
 				timestamp: now,
 				traceId: null,
-				transactionId: transactionId ?? CurrentTransaction()?.CurrentTransaction?.Id,
+				transactionId: transactionId ?? GetCurrentTransaction()?.CurrentTransaction?.Id,
 				transaction: null,
 				level: level,
 				message: message,
@@ -233,15 +229,18 @@ namespace WMS_Infrastructure.Instrumentation
 			var soapAction = httpRequest.ExtractSoapAction(null);
 			if (soapAction != null) transactionName = $" {soapAction}";
 
-			HttpContext.Current.Items["__APM_TRANSACTION_SPAN"] = InitTrasaction(transactionName, ApiConstants.TypeRequest, true);
+			var transaction = InitTrasaction(transactionName, ApiConstants.TypeRequest, true);
+			SetCurrentSpan(transaction);
 		}
+
 
 		private void OnEndRequest(object eventSender, EventArgs eventArgs)
 		{
-			var currentSpan = HttpContext.Current.Items["__APM_TRANSACTION_SPAN"] as AutoFinishingSpan;
-			HttpContext.Current.Items["__APM_TRANSACTION_SPAN"] = null;
+			var currentSpan = GetCurrentSpan();
+			SetCurrentSpan(null);
 			currentSpan?.Dispose();
-			HttpContext.Current.Items["__APM_TRANSACTION"] = null;
+			SetCurrentTransaction(null);
 		}
+
 	}
 }

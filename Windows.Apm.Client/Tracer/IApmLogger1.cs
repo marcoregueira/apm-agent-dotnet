@@ -8,7 +8,7 @@ namespace WMS_Infrastructure.Instrumentation
 	{
 		bool IsEnabled { get; set; }
 
-		ExecutionSegment CurrentTransaction();
+		ExecutionSegment GetCurrentTransaction();
 		void Dispose();
 		void Log(string log);
 		void LogCommandToApm(DbCommand command, Action action);

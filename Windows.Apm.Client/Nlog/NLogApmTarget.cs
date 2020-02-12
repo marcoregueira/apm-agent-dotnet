@@ -17,7 +17,7 @@ namespace Windows.Apm.Client.Nlog
 		protected override void Write(LogEventInfo logEvent)
 		{
 			var logMessage = Layout.Render(logEvent);
-			if (logEvent.Exception != null && ApmLogger.Default.CurrentTransaction() == null)
+			if (logEvent.Exception != null && ApmLogger.Default.GetCurrentTransaction() == null)
 			{
 				using (var trans = ApmLogger.Default.InitTrasaction("ErrorReport", "LogicGroup"))
 				{

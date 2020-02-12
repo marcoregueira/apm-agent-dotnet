@@ -15,7 +15,6 @@ namespace WMS_Infrastructure.Instrumentation
 {
 	public class ApmLoggerForms : IDisposable, IApmLogger
 	{
-
 		private bool Disposed { get; set; }
 		public static ConditionalWeakTable<Thread, ExecutionSegment> Traces { get; } = new ConditionalWeakTable<Thread, ExecutionSegment>();
 		public Thread CurrentTread { get; set; }
@@ -72,12 +71,9 @@ namespace WMS_Infrastructure.Instrumentation
 						ImplicitSpan = getSpan
 					};
 					Traces.Add(Thread.CurrentThread, trace);
-					//if (!getSpan)
-					return new AutoFinishingSpan(transaction, onFinish:
-						() =>
-						{
-							Traces.Remove(thread);
-						});
+					return new AutoFinishingSpan(
+						transaction,
+						onFinish: () => Traces.Remove(thread));
 				}
 
 				var currentSegment = trace.Spans.LastOrDefault() ?? trace.CurrentTransaction as IExecutionSegment;
@@ -87,7 +83,7 @@ namespace WMS_Infrastructure.Instrumentation
 				return new AutoFinishingSpan(newSegment, transaction, () =>
 				{
 					trace.Spans.Pop();
-					if (/*trace.ImplicitSpan && */ trace.Spans.Count == 0)
+					if (trace.Spans.Count == 0)
 					{
 						trace.CurrentTransaction.End();
 						//traces.Remove(thread);
@@ -95,7 +91,6 @@ namespace WMS_Infrastructure.Instrumentation
 				});
 			}
 		}
-
 
 		private void FinishCommand(DbCommand command, ISpan newSpan, Stopwatch stop)
 		{
@@ -150,7 +145,7 @@ namespace WMS_Infrastructure.Instrumentation
 		private ISpan GetSpan(DbCommand command)
 		{
 
-			var transaction = CurrentTransaction().CurrentTransaction ?? InitTrasaction(command.CommandText, ApiConstants.TypeDb).Span;
+			var transaction = GetCurrentTransaction().CurrentTransaction ?? InitTrasaction(command.CommandText, ApiConstants.TypeDb).Span;
 			return transaction.StartSpan(command.CommandText, ApiConstants.TypeDb);
 			//var _tracer = Agent.Tracer;
 			//var currentExecutionSegment = _tracer.CurrentSpan ?? (IExecutionSegment)_tracer.CurrentTransaction;
@@ -158,7 +153,7 @@ namespace WMS_Infrastructure.Instrumentation
 			//return newSpan;
 		}
 
-		public ExecutionSegment CurrentTransaction()
+		public ExecutionSegment GetCurrentTransaction()
 		{
 			Traces.TryGetValue(Thread.CurrentThread, out var executionSegment);
 			return executionSegment;
@@ -210,7 +205,7 @@ namespace WMS_Infrastructure.Instrumentation
 				parentId: null,
 				timestamp: TimeUtils.TimestampNow(),
 				traceId: null,
-				transactionId: transactionId ?? CurrentTransaction()?.CurrentTransaction?.Id,
+				transactionId: transactionId ?? GetCurrentTransaction()?.CurrentTransaction?.Id,
 				transaction: null,
 				level: level,
 				message: message,
@@ -223,8 +218,7 @@ namespace WMS_Infrastructure.Instrumentation
 		{
 			if (!IsEnabled) return;
 			var culprit = appName ?? ApplicationName;
-
-			var transaction = CurrentTransaction();
+			var transaction = GetCurrentTransaction();
 
 			//if (transaction == null)
 			{
