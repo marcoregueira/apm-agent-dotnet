@@ -29,6 +29,8 @@ namespace Elastic.Apm.Config
 			public const int TransactionMaxSpans = 500;
 			public const double TransactionSampleRate = 1.0;
 			public const string UnknownServiceName = "unknown";
+			public const bool UseElasticTraceparentHeader = true;
+			public const bool VerifyServerCert = true;
 
 			public static List<WildcardMatcher> DisableMetrics = new List<WildcardMatcher>();
 
@@ -82,6 +84,8 @@ namespace Elastic.Apm.Config
 			public const string StackTraceLimit = Prefix + "STACK_TRACE_LIMIT";
 			public const string TransactionMaxSpans = Prefix + "TRANSACTION_MAX_SPANS";
 			public const string TransactionSampleRate = Prefix + "TRANSACTION_SAMPLE_RATE";
+			public const string UseElasticTraceparentHeader = Prefix + "USE_ELASTIC_TRACEPARENT_HEADER";
+			public const string VerifyServerCert = Prefix + "VERIFY_SERVER_CERT";
 		}
 
 		public static class KeyNames
@@ -108,6 +112,8 @@ namespace Elastic.Apm.Config
 			public const string StackTraceLimit = "ElasticApm:StackTraceLimit";
 			public const string TransactionMaxSpans = "ElasticApm:TransactionMaxSpans";
 			public const string TransactionSampleRate = "ElasticApm:TransactionSampleRate";
+			public const string UseElasticTraceparentheader = "ElasticApm:UseElasticTraceparentHeder";
+			public const string VerifyServerCert = "ElasticApm:VerifyServerCert";
 		}
 
 		public static class SupportedValues

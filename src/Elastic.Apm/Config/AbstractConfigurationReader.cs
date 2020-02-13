@@ -33,6 +33,9 @@ namespace Elastic.Apm.Config
 		protected static ConfigurationKeyValue Kv(string key, string value, string origin) =>
 			new ConfigurationKeyValue(key, value, origin);
 
+		protected bool ParseUseElasticTraceparentHeader(ConfigurationKeyValue kv) =>
+			ParseBoolOption(kv, DefaultValues.UseElasticTraceparentHeader, "UseElasticTraceparentHeader");
+
 		protected internal static bool TryParseLogLevel(string value, out LogLevel level)
 		{
 			level = default;
@@ -115,6 +118,13 @@ namespace Elastic.Apm.Config
 			if (kv == null || string.IsNullOrEmpty(kv.Value)) return null;
 
 			return kv.Value;
+		}
+
+		protected bool ParseVerifyServerCert(ConfigurationKeyValue kv)
+		{
+			if (kv == null || string.IsNullOrEmpty(kv.Value)) return DefaultValues.VerifyServerCert;
+			// ReSharper disable once SimplifyConditionalTernaryExpression
+			return bool.TryParse(kv.Value, out var value) ? value : DefaultValues.VerifyServerCert;
 		}
 
 		protected bool ParseCaptureHeaders(ConfigurationKeyValue kv) => ParseBoolOption(kv, DefaultValues.CaptureHeaders, "CaptureHeaders");
