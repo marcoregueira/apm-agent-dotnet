@@ -29,7 +29,7 @@ namespace Windows.Apm.Client.Metrics
 
 		public DiskUsageProvider(IApmLogger logger = null, string drive = null)
 		{
-			_logger = logger?.Scoped(nameof(SystemTotalCpuProvider));
+			_logger = logger?.Scoped(nameof(DiskUsageProvider));
 
 			if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 				try

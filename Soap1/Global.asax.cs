@@ -37,12 +37,12 @@ namespace Soap1
 			//Configurar NLOG
 			//if (LogFile.ApmEnabled)
 			Target.Register<NLogApmTarget>("apm");
+			ApmLogger.Default = module;
 
 			FormsApmConfigurer.UseApm();
 			WmiCounters.LogInterfaceNames();
 			WmiCounters.EnableNetworkCounter(); //<-- pasar como parámetro la tarjeta de red, tal y como aparece en el log
 												//<-- si no se pasa la tarjeta, se utilizará la que tenga la mayor cuenta de bytes hasta el momento
-			ApmLogger.Default = module;
 		}
 
 		protected void Application_Start(object sender, EventArgs e)
