@@ -71,6 +71,10 @@ namespace Elastic.Apm.Config
 
 		public IReadOnlyList<WildcardMatcher> DisableMetrics => ParseDisableMetrics(Read(ConfigConsts.EnvVarNames.DisableMetrics));
 
+		public bool UseElasticTraceparentHeader => ParseUseElasticTraceparentHeader(Read(ConfigConsts.KeyNames.UseElasticTraceparentheader));
+
+		public virtual bool VerifyServerCert => ParseVerifyServerCert(Read(ConfigConsts.KeyNames.VerifyServerCert));
+
 		private ConfigurationKeyValue Read(string key) => new ConfigurationKeyValue(key, ConfigurationManager.AppSettings[key]?.Trim(), Origin);
 	}
 }
