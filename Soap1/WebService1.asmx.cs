@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Services;
+using Windows.Apm.Client.Nlog;
 
 namespace Soap1
 {
@@ -20,6 +21,7 @@ namespace Soap1
 		[WebMethod]
 		public ClRequest GetPendingOutputMessages(ClRequest req)
 		{
+			Logger.Instance.Debug("Called");
 			return req;
 		}
 	}
