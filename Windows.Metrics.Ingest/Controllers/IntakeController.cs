@@ -63,20 +63,25 @@ namespace Windows.Metrics.Ingest.Controllers
 
 				if (part.StartsWith("{\"metricset\":"))
 				{
-					var metricset = JsonConvert.DeserializeObject<MetricsetDto>(part, new MyDateTimeConverter());
+					var metricset = JsonConvert.DeserializeObject<MetricsetDto>(part, new ApmDateTimeConverter());
 					var metricValues = metricset.Metricset.Samples.Select(x => new { x.Key, x.Value.Value }).ToDictionary(x => x.Key, x => x.Value);
 					time = metricset.Metricset.Timestamp;
 
-					var dataDb = new MetricData() { Time = time, Host = metadata?.Metadata?.System.HostName, Metrics = JsonConvert.SerializeObject(metricValues) };
+					var dataDb = new MetricData()
+					{
+						Time = time,
+						Host = metadata?.Metadata?.System.HostName,
+						Metrics = JsonConvert.SerializeObject(metricValues)
+					};
 					Crud.Insert(dataDb);
 					continue;
 				}
 				else
 				if (part.StartsWith("{\"error\":"))
 				{
-					var errorSet = JsonConvert.DeserializeObject<ErrorsetDto>(part, new MyDateTimeConverter());
+					var errorSet = JsonConvert.DeserializeObject<ErrorsetDto>(part, new ApmDateTimeConverter());
 					var errorDetailsJson = errorSet.Error.ToString();
-					var errorInfo = JsonConvert.DeserializeObject<ErrorsetDto.ErrorDtoInternal>(errorDetailsJson, new MyDateTimeConverter());
+					var errorInfo = JsonConvert.DeserializeObject<ErrorsetDto.ErrorDtoInternal>(errorDetailsJson, new ApmDateTimeConverter());
 					time = errorInfo.Timestamp;
 					var dataDb = new ErrorData()
 					{
@@ -95,7 +100,7 @@ namespace Windows.Metrics.Ingest.Controllers
 				else
 				if (part.StartsWith("{\"log\":"))
 				{
-					var errorSet = JsonConvert.DeserializeObject<LogDto>(part, new MyDateTimeConverter());
+					var errorSet = JsonConvert.DeserializeObject<LogDto>(part, new ApmDateTimeConverter());
 					var errorDetailsJson = errorSet.LogInfo?.ToString();
 					var errorInfo = errorSet.Log; //JsonConvert.DeserializeObject<LogDto.LogDtoInternal>(errorDetailsJson, new MyDateTimeConverter());
 					time = errorInfo.Timestamp;
@@ -111,6 +116,52 @@ namespace Windows.Metrics.Ingest.Controllers
 						App = metadata?.Metadata?.Service?.Name,
 						ParentId = errorInfo.ParentId,
 						LogId = errorInfo.Id
+					};
+
+					Crud.Insert(dataDb);
+					continue;
+				}
+				else
+				if (part.StartsWith("{\"transaction\":"))
+				{
+					var errorSet = JsonConvert.DeserializeObject<TransactionDto>(part, new ApmDateTimeConverter());
+					var errorDetailsJson = errorSet.Transaction?.ToString();
+					var transactionInfo = JsonConvert.DeserializeObject<TransactionDto.TransactionDtoInternal>(errorDetailsJson, new ApmDateTimeConverter());
+					time = transactionInfo.Timestamp;
+					var dataDb = new TransactionData()
+					{
+						Time = time,
+						Host = metadata?.Metadata?.System.HostName,
+						App = metadata?.Metadata?.Service?.Name,
+						Type = transactionInfo.Type,
+						Id = transactionInfo.Trace_id,
+						TransactionId = transactionInfo.Trace_id,
+						Duration = transactionInfo.duration,
+						ParentId = null,
+						Data = JsonConvert.SerializeObject(errorSet.Transaction)
+					};
+
+					Crud.Insert(dataDb);
+					continue;
+				}
+				else
+				if (part.StartsWith("{\"span\":"))
+				{
+					var errorSet = JsonConvert.DeserializeObject<SpanDto>(part, new ApmDateTimeConverter());
+					var errorDetailsJson = errorSet.Span?.ToString();
+					var spanInfo = JsonConvert.DeserializeObject<SpanDto.TransactionDtoInternal>(errorDetailsJson, new ApmDateTimeConverter());
+					time = spanInfo.Timestamp;
+					var dataDb = new TransactionData()
+					{
+						Time = time,
+						Host = metadata?.Metadata?.System.HostName,
+						App = metadata?.Metadata?.Service?.Name,
+						Type = spanInfo.Type,
+						Id = spanInfo.Trace_id,
+						TransactionId = spanInfo.Trace_id,
+						Duration = spanInfo.duration,
+						ParentId = spanInfo.Parent_id,
+						Data = JsonConvert.SerializeObject(errorSet.Span)
 					};
 
 					Crud.Insert(dataDb);
@@ -165,7 +216,7 @@ namespace Windows.Metrics.Ingest.Controllers
 
 	}
 
-	public class MyDateTimeConverter : Newtonsoft.Json.JsonConverter
+	public class ApmDateTimeConverter : Newtonsoft.Json.JsonConverter
 	{
 		private static readonly DateTime BaseDate = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 		public override bool CanConvert(Type objectType) => objectType == typeof(DateTime);

@@ -44,6 +44,36 @@ namespace Windows.Metrics.Ingest.Data
 			}
 		}
 
+		public void Insert(TransactionData transaction)
+		{
+			/*
+					CREATE TABLE public.transaction
+					(
+					  "time" timestamp without time zone,
+					  host text,
+					  app text,
+					  type text,
+					  id text,
+					  transactionid text,
+					  parentid text,
+					  data jsonb
+					)
+					WITH (
+					  OIDS=FALSE
+					);
+
+			 */
+			using (var connection = new NpgsqlConnection(_connectionString))
+			{
+				connection.Open();
+				connection.Execute(@"
+						Insert into public.transaction (time, host, app, type, id, transactionid, parentid, duration, data)
+						values (@time, @host, @app, @type, @id, @transactionid, @parentid, @duration, CAST(@data AS json));", transaction);
+				//var value = connection.Query<string>("Select data ->> 'first_name' from Employee;");
+				//Console.WriteLine(value.First());
+			}
+		}
+
 		public void Insert(ErrorData data)
 		{
 			/*
@@ -78,7 +108,7 @@ namespace Windows.Metrics.Ingest.Data
 			}
 		}
 
-		public  void Insert(LogData data)
+		public void Insert(LogData data)
 		{
 			/*
 

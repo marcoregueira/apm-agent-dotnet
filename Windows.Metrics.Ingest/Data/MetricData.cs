@@ -32,4 +32,17 @@ namespace Windows.Metrics.Ingest.Data
 		public string App { get; set; }
 		public object LogInfo { get; set; }
 	}
+
+	public class TransactionData
+	{
+		public DateTime Time { get; set; }
+		public string Host { get; set; }
+		public string App { get; set; }
+		public string Type { get; set; }
+		public string Id { get; set; }
+		public string TransactionId { get; set; }
+		public string ParentId { get; set; }
+		public decimal Duration { get; set; }
+		public object Data { get; set; }
+	}
 }
