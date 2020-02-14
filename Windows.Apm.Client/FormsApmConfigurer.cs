@@ -36,7 +36,7 @@ namespace Windows.Apm.Client
 			var collector = new MetricsCollector(logger, sender, configurationReader);
 
 			collector.MetricsProviders?.Add(new NetworkMetricProvider());
-			collector.MetricsProviders?.Add(new DiskUsageProvider(drive: "C:"));
+			collector.MetricsProviders?.Add(new DiskUsageProvider());
 
 			var components = new AgentComponents(
 				logger: logger,
