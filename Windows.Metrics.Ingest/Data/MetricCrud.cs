@@ -38,7 +38,7 @@ namespace Windows.Metrics.Ingest.Data
 			using (var connection = new NpgsqlConnection(_connectionString))
 			{
 				connection.Open();
-				connection.Execute("Insert into public.metrics (time, host, data) values (@time, @host, CAST(@metrics AS json));", data);
+				connection.Execute("Insert into public.metrics (time, host, data) values (@time, @host, CAST(@metrics AS jsonb));", data);
 				//var value = connection.Query<string>("Select data ->> 'first_name' from Employee;");
 				//Console.WriteLine(value.First());
 			}
@@ -68,7 +68,7 @@ namespace Windows.Metrics.Ingest.Data
 				connection.Open();
 				connection.Execute(@"
 						Insert into public.transaction (time, host, app, type, id, transactionid, parentid, duration, data)
-						values (@time, @host, @app, @type, @id, @transactionid, @parentid, @duration, CAST(@data AS json));", transaction);
+						values (@time, @host, @app, @type, @id, @transactionid, @parentid, @duration, CAST(@data AS jsonb));", transaction);
 				//var value = connection.Query<string>("Select data ->> 'first_name' from Employee;");
 				//Console.WriteLine(value.First());
 			}
@@ -102,7 +102,7 @@ namespace Windows.Metrics.Ingest.Data
 					Insert into public.errors
 					(time, host, data, transactionid, errorid, app)
 					values
-					(@time, @host, CAST(@errorInfo AS json),  @transactionid, @errorid, @app);", data);
+					(@time, @host, CAST(@errorInfo AS jsonb),  @transactionid, @errorid, @app);", data);
 				//var value = connection.Query<string>("Select data ->> 'first_name' from Employee;");
 				//Console.WriteLine(value.First());
 			}
@@ -136,7 +136,7 @@ namespace Windows.Metrics.Ingest.Data
 					Insert into public.log
 					(time, host, data, transactionid, logid, app, level, message)
 					values
-					(@time, @host, CAST(@logInfo AS json),  @transactionid, @logid, @app, @level,  @message);", data);
+					(@time, @host, CAST(@logInfo AS jsonb),  @transactionid, @logid, @app, @level,  @message);", data);
 				//var value = connection.Query<string>("Select data ->> 'first_name' from Employee;");
 				//Console.WriteLine(value.First());
 			}
