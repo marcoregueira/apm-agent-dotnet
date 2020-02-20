@@ -171,11 +171,11 @@ namespace WMS_Infrastructure.Instrumentation
 		}
 
 
-		public void LogTraceToApm(string message, string transactionId = null, string host = null, string appName = null, object logInfo = null, string level = null)
+		public void LogTraceToApm(string message, string transactionId = null, string host = null, string appName = null, object logInfo = null, string level = null, DateTime? customDate = null)
 		{
 			if (!IsEnabled) return;
 			var culprit = appName ?? ApplicationName;
-			var now = TimeUtils.TimestampNow();
+			var now = TimeUtils.ToTimestamp(customDate) ?? TimeUtils.TimestampNow();
 			var errorLog = new LogEntry(
 				culprit: culprit,
 				id: null,

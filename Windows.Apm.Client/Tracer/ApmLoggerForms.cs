@@ -19,7 +19,7 @@ namespace WMS_Infrastructure.Instrumentation
 		public static ConditionalWeakTable<Thread, ExecutionSegment> Traces { get; } = new ConditionalWeakTable<Thread, ExecutionSegment>();
 		public Thread CurrentTread { get; set; }
 
-		public static string ApplicationName { get; } = AppDomain.CurrentDomain.FriendlyName;
+		public static string ApplicationName { get; set; } = AppDomain.CurrentDomain.FriendlyName;
 
 		public bool IsEnabled { get; set; } = true;
 
@@ -193,8 +193,7 @@ namespace WMS_Infrastructure.Instrumentation
 				}
 		}
 
-
-		public void LogTraceToApm(string message, string transactionId = null, string host = null, string appName = null, object logInfo = null, string level = null)
+		public void LogTraceToApm(string message, string transactionId = null, string host = null, string appName = null, object logInfo = null, string level = null, DateTime? customDate = null)
 		{
 			if (!IsEnabled) return;
 			var culprit = appName ?? ApplicationName;
@@ -203,7 +202,7 @@ namespace WMS_Infrastructure.Instrumentation
 				culprit: culprit,
 				id: null,
 				parentId: null,
-				timestamp: TimeUtils.TimestampNow(),
+				timestamp: TimeUtils.ToTimestamp(customDate) ?? TimeUtils.TimestampNow(),
 				traceId: null,
 				transactionId: transactionId ?? GetCurrentTransaction()?.CurrentTransaction?.Id,
 				transaction: null,
@@ -213,6 +212,7 @@ namespace WMS_Infrastructure.Instrumentation
 
 			(Agent.Instance.PayloadSender as LocalPayloadSenderV2)?.EnqueueEvent(errorLog, "log");
 		}
+
 
 		public void LogExceptionToApm(Exception ex, string name, string transactionId = null, string host = null, string appName = null)
 		{
