@@ -35,7 +35,7 @@ namespace Windows.Apm.Client.Nlog
 		// This constructor is meant for serialization
 		[JsonConstructor]
 		internal LogEntry(string culprit, string id, string parentId, long timestamp, string traceId,
-			string transactionId, TransactionData transaction, string level, string message, object logInfo
+			string transactionId, TransactionData transaction, string level, string message, Dictionary<string, object> logInfo
 		)
 		{
 			Culprit = culprit;

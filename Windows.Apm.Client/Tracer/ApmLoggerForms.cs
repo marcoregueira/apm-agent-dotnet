@@ -3,6 +3,7 @@ using Elastic.Apm.Api;
 using Elastic.Apm.Helpers;
 using Elastic.Apm.Report;
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Diagnostics;
@@ -193,8 +194,26 @@ namespace WMS_Infrastructure.Instrumentation
 				}
 		}
 
-		public void LogTraceToApm(string message, string transactionId = null, string host = null, string appName = null, object logInfo = null, string level = null, DateTime? customDate = null)
+		public void LogTraceToApm(string message, string transactionId = null, string host = null, string appName = null, Dictionary<string, object> logInfo = null, string level = null, DateTime? customDate = null)
 		{
+			var info = new Dictionary<string, object>();
+			var trans = GetCurrentTransaction();
+			if (trans?.CurrentTransaction != null)
+			{
+				foreach (var pair in trans.CurrentTransaction.Labels)
+				{
+					info[pair.Key] = pair.Value;
+				}
+			}
+
+			if (logInfo != null)
+			{
+				foreach (var pair in logInfo)
+				{
+					info[pair.Key] = pair.Value;
+				}
+			}
+
 			if (!IsEnabled) return;
 			var culprit = appName ?? ApplicationName;
 			var now = TimeUtils.TimestampNow();
@@ -208,7 +227,7 @@ namespace WMS_Infrastructure.Instrumentation
 				transaction: null,
 				level: level,
 				message: message,
-				logInfo: logInfo);
+				logInfo: info);
 
 			(Agent.Instance.PayloadSender as LocalPayloadSenderV2)?.EnqueueEvent(errorLog, "log");
 		}
@@ -229,6 +248,13 @@ namespace WMS_Infrastructure.Instrumentation
 			{
 
 			}
+		}
+
+		public void AddCustomData(string key, object value)
+		{
+			var labels = GetCurrentTransaction()?.CurrentTransaction.Labels;
+			if (labels != null)
+				labels[key] = value?.ToString();
 		}
 	}
 }

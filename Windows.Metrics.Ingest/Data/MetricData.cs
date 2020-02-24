@@ -31,7 +31,7 @@ namespace Windows.Metrics.Ingest.Data
 		public string ParentId { get; set; }
 		public string TransactionId { get; set; }
 		public string App { get; set; }
-		public Dictionary<string, string> LogInfo { get; set; }
+		public string LogInfo { get; set; }
 		public string User { get; internal set; }
 	}
 

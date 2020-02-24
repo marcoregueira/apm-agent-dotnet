@@ -5,6 +5,7 @@ using Elastic.Apm.AspNetFullFramework.Extensions;
 using Elastic.Apm.Helpers;
 using Elastic.Apm.Report;
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Diagnostics;
@@ -71,7 +72,6 @@ namespace WMS_Infrastructure.Instrumentation
 				}
 			});
 		}
-
 
 
 		private void FinishCommand(DbCommand command, ISpan newSpan, Stopwatch stop)
@@ -171,8 +171,27 @@ namespace WMS_Infrastructure.Instrumentation
 		}
 
 
-		public void LogTraceToApm(string message, string transactionId = null, string host = null, string appName = null, object logInfo = null, string level = null, DateTime? customDate = null)
+		public void LogTraceToApm(string message, string transactionId = null, string host = null, string appName = null, Dictionary<string, object> logInfo = null, string level = null, DateTime? customDate = null)
 		{
+
+			var info = new Dictionary<string, object>();
+			var trans = GetCurrentTransaction();
+			if (trans?.CurrentTransaction != null)
+			{
+				foreach (var pair in trans.CurrentTransaction.Labels)
+				{
+					//customvalues permite objetos, no queremos sobreescribirlos con el nombre de un tipo...
+					if (!CustomValues.ContainsKey(pair.Key))
+						CustomValues[pair.Key] = pair.Value;
+				}
+			}
+
+			if (logInfo != null)
+				foreach (var pair in logInfo)
+				{
+					CustomValues[pair.Key] = pair.Value;
+				}
+
 			if (!IsEnabled) return;
 			var culprit = appName ?? ApplicationName;
 			var now = TimeUtils.ToTimestamp(customDate) ?? TimeUtils.TimestampNow();
@@ -186,7 +205,7 @@ namespace WMS_Infrastructure.Instrumentation
 				transaction: null,
 				level: level,
 				message: message,
-				logInfo: logInfo);
+				logInfo: CustomValues);
 
 			(Agent.Instance.PayloadSender as LocalPayloadSenderV2)?.EnqueueEvent(errorLog, "log");
 		}
@@ -221,6 +240,7 @@ namespace WMS_Infrastructure.Instrumentation
 
 		private void ProcessBeginRequest(object eventSender)
 		{
+			CustomValues = new Dictionary<string, object>();
 			var httpApp = (HttpApplication)eventSender;
 			var httpRequest = httpApp.Context.Request;
 
@@ -242,5 +262,16 @@ namespace WMS_Infrastructure.Instrumentation
 			SetCurrentTransaction(null);
 		}
 
+		private Dictionary<string, object> CustomValues { get; set; }
+		public void AddCustomData(string key, object value)
+		{
+			var transaction = GetCurrentTransaction();
+			if (transaction != null)
+			{
+				transaction.CurrentTransaction.Labels[key] = value.ToString();
+			}
+
+			CustomValues[key] = value;
+		}
 	}
 }

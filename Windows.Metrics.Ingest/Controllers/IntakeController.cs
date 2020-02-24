@@ -116,6 +116,7 @@ namespace Windows.Metrics.Ingest.Controllers
 						App = errorInfo.Culprit ?? metadata?.Metadata?.Service?.Name,
 						ParentId = errorInfo.ParentId,
 						LogId = errorInfo.Id,
+						LogInfo = JsonConvert.SerializeObject(errorInfo.LogInfo)
 					};
 
 					if (errorInfo.LogInfo != null)
@@ -126,6 +127,9 @@ namespace Windows.Metrics.Ingest.Controllers
 						if (errorInfo.LogInfo.ContainsKey("user"))
 							dataDb.User = errorInfo.LogInfo["user"];
 					}
+
+					if (string.IsNullOrEmpty(dataDb.User))
+						dataDb.User = "(Vacío)";
 
 					Crud.Insert(dataDb);
 					continue;
