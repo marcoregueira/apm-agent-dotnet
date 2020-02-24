@@ -14,16 +14,29 @@ namespace Windows.Apm.Client.Nlog
 	[Target("apm")]
 	public class NLogApmTarget : TargetWithContext
 	{
+		private static Action<LogEventInfo> _event;
+
+		public static void OnTrace(Action<LogEventInfo> onTrace)
+		{
+			_event = onTrace;
+		}
+
 		protected override void Write(LogEventInfo logEvent)
 		{
 			var logMessage = Layout.Render(logEvent);
 			var currentTransaction = ApmLogger.Default.GetCurrentTransaction();
 			var transactionId = currentTransaction?.CurrentTransaction?.Id;
+
+			_event?.Invoke(logEvent);
+
 			if (logEvent.Exception != null && currentTransaction == null)
 			{
 				using (var trans = ApmLogger.Default.InitTrasaction("ErrorReport", "LogicGroup"))
 				{
-					ApmLogger.Default.LogTraceToApm(logMessage, level: logEvent.Level.ToString());
+					ApmLogger.Default.LogTraceToApm(
+						logMessage,
+						level: logEvent.Level.ToString(),
+						logInfo: logEvent.Properties);
 					ApmLogger.Default.LogExceptionToApm(logEvent.Exception, logEvent.Message ?? logEvent.Exception.Message);
 				}
 				return;
@@ -36,12 +49,11 @@ namespace Windows.Apm.Client.Nlog
 					logEvent.Message ?? logEvent.Exception.Message,
 					transactionId: transactionId);
 			}
-
 			ApmLogger.Default.LogTraceToApm(
 				logMessage,
 				level: logEvent.Level.ToString(),
-				transactionId: transactionId);
-			//var logProperties = GetAllProperties(logEvent);
+				transactionId: transactionId,
+				logInfo: logEvent.Properties);
 		}
 	}
 }

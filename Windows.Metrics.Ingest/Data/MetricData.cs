@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Windows.Metrics.Ingest.Data
 {
@@ -30,7 +31,8 @@ namespace Windows.Metrics.Ingest.Data
 		public string ParentId { get; set; }
 		public string TransactionId { get; set; }
 		public string App { get; set; }
-		public object LogInfo { get; set; }
+		public Dictionary<string, string> LogInfo { get; set; }
+		public string User { get; internal set; }
 	}
 
 	public class TransactionData

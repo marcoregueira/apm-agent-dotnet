@@ -20,8 +20,14 @@ namespace WindowsFormsClient
 		{
 			//Registrar nuestro conector APM en NLOG
 			Target.Register<NLogApmTarget>("apm");
+			NLogApmTarget.OnTrace(x =>
+			{
+				x.Properties["host"] = "somehost";
+				x.Properties["user"] = "marco";
+			});
+
 			FormsApmConfigurer.SetLoggerTargetFolder("c:/temp");
-			FormsApmConfigurer.UseApm();
+			FormsApmConfigurer.UseApm("c:");
 
 			WmiCounters.LogInterfaceNames();
 			WmiCounters.EnableNetworkCounter(); //<-- pasar como parámetro la tarjeta de red, tal y como aparece en el log

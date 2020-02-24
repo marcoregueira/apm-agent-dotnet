@@ -35,12 +35,18 @@ namespace Windows.Apm.Client.Metrics
 				try
 				{
 					_MainDrive = (drive ?? "_Total").Trim();
-					if (drive.Length == 1) drive += ":";
+					if (_MainDrive != "_Total")
+					{
+						_MainDrive = _MainDrive.ToUpper()[0].ToString();
+					}
+
+					if (_MainDrive.Length == 1)
+						_MainDrive += ":";
 
 					// \PhysicalDisk(*)\Current Disk Queue Length
 					// \LogicalDisk(_Total)\% Free Space
 					_queueLengthPerformanceCounter = new PerformanceCounter("PhysicalDisk", "Current Disk Queue Length", "_Total");
-					_diskFreeSpaceCounter = new PerformanceCounter("LogicalDisk", "% Free Space", "c:");
+					_diskFreeSpaceCounter = new PerformanceCounter("LogicalDisk", "% Free Space", _MainDrive ?? "C:");
 					//The perf. counter API returns 0 the for the 1. call (probably because there is no delta in the 1. call) - so we just call it here first
 					_queueLengthPerformanceCounter.NextValue();
 				}
@@ -65,7 +71,7 @@ namespace Windows.Apm.Client.Metrics
 
 
 		public int ConsecutiveNumberOfFailedReads { get; set; }
-		public string DbgName => "total system CPU time";
+		public string DbgName => "total disk space";
 
 
 		private StreamReader GetProcStatAsStream()
@@ -85,10 +91,10 @@ namespace Windows.Apm.Client.Metrics
 				var valQueue = _queueLengthPerformanceCounter.NextValue();
 				var valSpace = _diskFreeSpaceCounter.NextValue();
 				return new List<MetricSample> {
-					new MetricSample(DiskQueueTotalLength, (double)valQueue / 100),
-					new MetricSample(DiskSpace, (double)valSpace/ 100),
-					new MetricSample(DiskDrive, driveNumber / 100),
-			};
+					new MetricSample(DiskQueueTotalLength, (double)valQueue),
+					new MetricSample(DiskSpace, 100 - (double)valSpace),
+					new MetricSample(DiskDrive, driveNumber ),
+				};
 			}
 
 			if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))

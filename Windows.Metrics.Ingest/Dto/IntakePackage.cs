@@ -44,6 +44,7 @@ namespace Windows.Metrics.Ingest.Dto
 			public DateTime Timestamp { get; set; }
 			public string Level { get; set; }
 			public string Message { get; set; }
+			public Dictionary<string, string> LogInfo { get; set; }
 		}
 	}
 

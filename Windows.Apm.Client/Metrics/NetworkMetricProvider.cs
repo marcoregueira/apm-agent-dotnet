@@ -19,32 +19,7 @@ namespace Windows.Apm.Client.Metrics
 		public int ConsecutiveNumberOfFailedReads { get; set; }
 		public string DbgName => "custom network traffic";
 
-		public NetworkMetricProvider(IApmLogger logger = null)
-		{
-			_logger = logger;
-
-			if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-			{
-				//try
-				//{
-				//	_processorTimePerfCounter = new PerformanceCounter("Processor", "% Processor Time", "_Total");
-				//	//The perf. counter API returns 0 the for the 1. call (probably because there is no delta in the 1. call) - so we just call it here first
-				//	_processorTimePerfCounter.NextValue();
-				//}
-				//catch (Exception e)
-				//{
-				//	_logger.Error()
-				//		?.LogException(e, "Failed instantiating PerformanceCounter "
-				//			+ "- please make sure the current user has permissions to read performance counters. E.g. make sure the current user is member of "
-				//			+ "the 'Performance Monitor Users' group");
-				//
-				//	_processorTimePerfCounter?.Dispose();
-				//	_processorTimePerfCounter = null;
-				//}
-
-			}
-			if (!RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) return;
-		}
+		public NetworkMetricProvider(IApmLogger logger = null) => _logger = logger;
 
 		public IEnumerable<MetricSample> GetSamples()
 		{

@@ -113,10 +113,19 @@ namespace Windows.Metrics.Ingest.Controllers
 						Level = errorInfo.Level,
 						//ErrorInfo = errorSet.LogInfo.ToString(),
 						TransactionId = errorInfo.Transaction_Id,
-						App = metadata?.Metadata?.Service?.Name,
+						App = errorInfo.Culprit ?? metadata?.Metadata?.Service?.Name,
 						ParentId = errorInfo.ParentId,
-						LogId = errorInfo.Id
+						LogId = errorInfo.Id,
 					};
+
+					if (errorInfo.LogInfo != null)
+					{
+						if (errorInfo.LogInfo.ContainsKey("host"))
+							dataDb.Host = errorInfo.LogInfo["host"];
+
+						if (errorInfo.LogInfo.ContainsKey("user"))
+							dataDb.User = errorInfo.LogInfo["user"];
+					}
 
 					Crud.Insert(dataDb);
 					continue;

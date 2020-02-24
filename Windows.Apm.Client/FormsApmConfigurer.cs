@@ -21,7 +21,7 @@ namespace Windows.Apm.Client
 	public class FormsApmConfigurer
 	{
 
-		public static void UseApm()
+		public static void UseApm(string diskDrive = null)
 		{
 			var configurationReader = new LocalConfigurationReader();
 			var logger = ConsoleLogger.LoggerOrDefault(configurationReader.LogLevel);
@@ -35,8 +35,8 @@ namespace Windows.Apm.Client
 
 			var collector = new MetricsCollector(logger, sender, configurationReader);
 
-			collector.MetricsProviders?.Add(new NetworkMetricProvider());
-			collector.MetricsProviders?.Add(new DiskUsageProvider());
+			collector.MetricsProviders?.Add(new NetworkMetricProvider(logger));
+			collector.MetricsProviders?.Add(new DiskUsageProvider(logger, diskDrive));
 
 			var components = new AgentComponents(
 				logger: logger,
