@@ -271,6 +271,7 @@ namespace WMS_Infrastructure.Instrumentation
 				transaction.CurrentTransaction.Labels[key] = value.ToString();
 			}
 
+			if (CustomValues == null) CustomValues = new Dictionary<string, object>();
 			CustomValues[key] = value;
 		}
 	}
