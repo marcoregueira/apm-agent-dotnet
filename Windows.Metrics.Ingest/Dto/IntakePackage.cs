@@ -74,6 +74,7 @@ namespace Windows.Metrics.Ingest.Dto
 
 		public TransactionDtoInternal TransactionInfo { get; set; }
 
+
 		public class TransactionDtoInternal
 		{
 			//"context":{},
@@ -85,6 +86,12 @@ namespace Windows.Metrics.Ingest.Dto
 			public DateTime Timestamp { get; set; }           //                    1581631012472065,
 			public string Trace_id { get; set; }              //              "76d01eaf4700f78dbf06c68b035f9f27",
 			public string Type { get; set; }                    //     "request"}
+			public ContextDto Context { get; set; }
+		}
+
+		public class ContextDto
+		{
+			public Dictionary<string, string> Tags { get; set; }
 		}
 	}
 	public class SpanDto

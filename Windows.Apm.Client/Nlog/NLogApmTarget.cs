@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Elastic.Apm.Api;
 using NLog;
-using NLog.Common;
 using NLog.Targets;
 using WMS_Infrastructure.Instrumentation;
 

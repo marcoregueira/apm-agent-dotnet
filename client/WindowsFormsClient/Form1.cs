@@ -49,7 +49,16 @@ namespace WindowsFormsClient
 		}
 
 		private void BtnException_Click(object sender, EventArgs e)
-				=> ApmLogger.Default.LogExceptionToApm(new InvalidOperationException(TxtExceptionMessage.Text.Replace("{datetime}", DateTime.Now.ToString())), "excecption");
+		{
+			try
+			{
+				throw new InvalidOperationException(TxtExceptionMessage.Text.Replace("{datetime}", DateTime.Now.ToString()));
+			}
+			catch (Exception ex)
+			{
+				ApmLogger.Default.LogExceptionToApm(ex, "exception");
+			}
+		}
 
 		private void BtnLog_Click(object sender, EventArgs e)
 			=> ApmLogger.Default.LogTraceToApm(TxtLogMessage.Text.Replace("{datetime}", DateTime.Now.ToString()));

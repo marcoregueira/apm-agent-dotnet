@@ -67,8 +67,8 @@ namespace Windows.Metrics.Ingest.Data
 			{
 				connection.Open();
 				connection.Execute(@"
-						Insert into public.transaction (time, host, app, type, id, transactionid, parentid, duration, data)
-						values (@time, @host, @app, @type, @id, @transactionid, @parentid, @duration, CAST(@data AS jsonb));", transaction);
+						Insert into public.transaction (time, host, app, type, id, transactionid, parentid, duration, data, userid)
+						values (@time, @host, @app, @type, @id, @transactionid, @parentid, @duration, CAST(@data AS jsonb), @user);", transaction);
 				//var value = connection.Query<string>("Select data ->> 'first_name' from Employee;");
 				//Console.WriteLine(value.First());
 			}

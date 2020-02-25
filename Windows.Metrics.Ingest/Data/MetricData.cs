@@ -39,6 +39,7 @@ namespace Windows.Metrics.Ingest.Data
 	{
 		public DateTime Time { get; set; }
 		public string Host { get; set; }
+		public string User { get; set; }
 		public string App { get; set; }
 		public string Type { get; set; }
 		public string Id { get; set; }

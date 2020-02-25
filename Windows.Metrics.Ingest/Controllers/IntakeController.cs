@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -141,10 +142,13 @@ namespace Windows.Metrics.Ingest.Controllers
 					var errorDetailsJson = errorSet.Transaction?.ToString();
 					var transactionInfo = JsonConvert.DeserializeObject<TransactionDto.TransactionDtoInternal>(errorDetailsJson, new ApmDateTimeConverter());
 					time = transactionInfo.Timestamp;
+					var tags = transactionInfo.Context?.Tags ?? new Dictionary<string, string>();
 					var dataDb = new TransactionData()
 					{
 						Time = time,
-						Host = metadata?.Metadata?.System.HostName,
+						Host = tags.ContainsKey("host") ? tags["host"] : metadata?.Metadata?.System.HostName,
+						User = tags.ContainsKey("user") ? tags["user"] : "(Vacío)",
+
 						App = metadata?.Metadata?.Service?.Name,
 						Type = transactionInfo.Type,
 						Id = transactionInfo.Trace_id,
