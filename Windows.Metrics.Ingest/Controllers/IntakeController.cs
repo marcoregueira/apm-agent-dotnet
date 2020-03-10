@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -23,8 +24,6 @@ namespace Windows.Metrics.Ingest.Controllers
 			Crud = crud;
 		}
 
-
-
 		[HttpPost("/{index}/_doc")]
 		[HttpPost("/{index}/_doc/id")]
 		[HttpPost("/{index}/_create")]
@@ -33,7 +32,8 @@ namespace Windows.Metrics.Ingest.Controllers
 		{
 			var reader = new StreamReader(HttpContext.Request.Body);
 			var package = await reader.ReadToEndAsync() ?? "";
-			if (!package.StartsWith("{")) return BadRequest();
+			if (!package.StartsWith("{"))
+				return BadRequest();
 			return Ok();
 		}
 
@@ -43,7 +43,8 @@ namespace Windows.Metrics.Ingest.Controllers
 		{
 			var reader = new StreamReader(HttpContext.Request.Body);
 			var package = await reader.ReadToEndAsync() ?? "";
-			if (!package.StartsWith("{")) return BadRequest();
+			if (!package.StartsWith("{"))
+				return BadRequest();
 
 			MetaDataDto metadata = null;
 			var time = DateTime.Now;
@@ -76,8 +77,7 @@ namespace Windows.Metrics.Ingest.Controllers
 					};
 					Crud.Insert(dataDb);
 					continue;
-				}
-				else
+				} else
 				if (part.StartsWith("{\"error\":"))
 				{
 					var errorSet = JsonConvert.DeserializeObject<ErrorsetDto>(part, new ApmDateTimeConverter());
@@ -97,8 +97,7 @@ namespace Windows.Metrics.Ingest.Controllers
 
 					Crud.Insert(dataDb);
 					continue;
-				}
-				else
+				} else
 				if (part.StartsWith("{\"log\":"))
 				{
 					var errorSet = JsonConvert.DeserializeObject<LogDto>(part, new ApmDateTimeConverter());
@@ -122,11 +121,30 @@ namespace Windows.Metrics.Ingest.Controllers
 
 					if (errorInfo.LogInfo != null)
 					{
-						if (errorInfo.LogInfo.ContainsKey("host"))
+						if (errorInfo.LogInfo.ContainsKey("host") && errorInfo.LogInfo["host"] != null)
 							dataDb.Host = errorInfo.LogInfo["host"];
 
-						if (errorInfo.LogInfo.ContainsKey("user"))
+						if (errorInfo.LogInfo.ContainsKey("user") && errorInfo.LogInfo["user"] != null)
 							dataDb.User = errorInfo.LogInfo["user"];
+
+						if (errorInfo.LogInfo.ContainsKey("remotehost") && errorInfo.LogInfo["remotehost"] != null)
+							dataDb.RemoteHost = errorInfo.LogInfo["remotehost"];
+
+						if (errorInfo.LogInfo.ContainsKey("database") && errorInfo.LogInfo["database"] != null)
+							dataDb.Database = errorInfo.LogInfo["database"];
+
+						if (errorInfo.LogInfo.ContainsKey("app") && errorInfo.LogInfo["app"] != null)
+							dataDb.App = errorInfo.LogInfo["app"];
+
+						if (errorInfo.LogInfo.ContainsKey("duration") && errorInfo.LogInfo["duration"] != null)
+						{
+							var duration = errorInfo.LogInfo["duration"];
+							if (decimal.TryParse(duration, NumberStyles.Float, CultureInfo.InvariantCulture, out var ms))
+							{
+								dataDb.Duration = ms;
+							}
+						}
+
 					}
 
 					if (string.IsNullOrEmpty(dataDb.User))
@@ -134,8 +152,7 @@ namespace Windows.Metrics.Ingest.Controllers
 
 					Crud.Insert(dataDb);
 					continue;
-				}
-				else
+				} else
 				if (part.StartsWith("{\"transaction\":"))
 				{
 					var errorSet = JsonConvert.DeserializeObject<TransactionDto>(part, new ApmDateTimeConverter());
@@ -160,8 +177,7 @@ namespace Windows.Metrics.Ingest.Controllers
 
 					Crud.Insert(dataDb);
 					continue;
-				}
-				else
+				} else
 				if (part.StartsWith("{\"span\":"))
 				{
 					var errorSet = JsonConvert.DeserializeObject<SpanDto>(part, new ApmDateTimeConverter());
@@ -183,8 +199,7 @@ namespace Windows.Metrics.Ingest.Controllers
 
 					Crud.Insert(dataDb);
 					continue;
-				}
-				else
+				} else
 				{
 					Console.WriteLine(part);
 				}
@@ -240,12 +255,10 @@ namespace Windows.Metrics.Ingest.Controllers
 
 		public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
 		{
-			var t = (long)reader.Value;
+			var t = (long) reader.Value;
 			return BaseDate.AddMilliseconds(t / 1000);
 		}
 
 		public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer) => throw new NotImplementedException();
 	}
-
-
 }

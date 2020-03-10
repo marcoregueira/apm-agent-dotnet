@@ -50,12 +50,14 @@ namespace WMS_Infrastructure.Instrumentation
 
 		public void Dispose()
 		{
-			if (Disposed) return;
+			if (Disposed)
+				return;
 		}
 
 		public AutoFinishingSpan InitTrasaction(string name, string type, bool getSpan = false)
 		{
-			if (!IsEnabled) return new AutoFinishingSpan(null);
+			if (!IsEnabled)
+				return new AutoFinishingSpan(null);
 
 			ITransaction transaction = null;
 			lock (Traces)
@@ -95,7 +97,8 @@ namespace WMS_Infrastructure.Instrumentation
 
 		private void FinishCommand(DbCommand command, ISpan newSpan, Stopwatch stop)
 		{
-			if (!IsEnabled) return;
+			if (!IsEnabled)
+				return;
 
 			newSpan.Context.Db = new Database
 			{
@@ -182,13 +185,11 @@ namespace WMS_Infrastructure.Instrumentation
 				{
 					time.Start();
 					action.Invoke();
-				}
-				catch (Exception ex)
+				} catch (Exception ex)
 				{
 					span.CaptureException(ex);
 					throw;
-				}
-				finally
+				} finally
 				{
 					FinishCommand(command, span.Span as ISpan, time);
 				}
@@ -214,7 +215,13 @@ namespace WMS_Infrastructure.Instrumentation
 				}
 			}
 
-			if (!IsEnabled) return;
+			if (!string.IsNullOrWhiteSpace(host))
+			{
+				info[host] = host;
+			}
+
+			if (!IsEnabled)
+				return;
 			var culprit = appName ?? ApplicationName;
 			var now = TimeUtils.TimestampNow();
 			var errorLog = new LogEntry(
@@ -235,7 +242,8 @@ namespace WMS_Infrastructure.Instrumentation
 
 		public void LogExceptionToApm(Exception ex, string name, string transactionId = null, string host = null, string appName = null)
 		{
-			if (!IsEnabled) return;
+			if (!IsEnabled)
+				return;
 			var culprit = appName ?? ApplicationName;
 			var transaction = GetCurrentTransaction();
 

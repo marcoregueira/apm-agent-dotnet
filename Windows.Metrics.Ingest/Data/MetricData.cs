@@ -32,7 +32,10 @@ namespace Windows.Metrics.Ingest.Data
 		public string TransactionId { get; set; }
 		public string App { get; set; }
 		public string LogInfo { get; set; }
-		public string User { get; internal set; }
+		public string User { get; set; }
+		public string RemoteHost { get; set; }
+		public string Database { get; set; }
+		public decimal? Duration { get; set; }
 	}
 
 	public class TransactionData

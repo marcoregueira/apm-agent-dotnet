@@ -134,9 +134,22 @@ namespace Windows.Metrics.Ingest.Data
 				connection.Open();
 				connection.Execute(@"
 					Insert into public.log
-					(time, host, data, transactionid, logid, app, level, message, userid)
+					(time, host, data, transactionid,
+					   database, remotehost, duration,
+					   logid, app, level, message, userid)
 					values
-					(@time, @host, CAST(@logInfo AS jsonb),  @transactionid, @logid, @app, @level, @message, @user);", data);
+					(	@time,
+						@host,
+						CAST(@logInfo AS jsonb),
+						@transactionid,
+						@database,
+						@remotehost,
+						@duration,
+						@logid,
+						@app,
+						@level,
+						@message,
+						@user);", data);
 				//var value = connection.Query<string>("Select data ->> 'first_name' from Employee;");
 				//Console.WriteLine(value.First());
 			}
