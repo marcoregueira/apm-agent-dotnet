@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Elastic.Apm.AspNetFullFramework;
+using Elastic.Apm.Logging;
 using NLog.Targets;
 using ProcessMonitoring;
 using Windows.Apm.Client;
@@ -26,8 +28,19 @@ namespace WindowsFormsClient
 				x.Properties["user"] = "marco";
 			});
 
+			var customLogger = new ConsoleLoggerWithEvents(LogLevel.Trace);
+			customLogger.OnTrace((level, message) =>
+			{
+				if (message.StartsWith("{LocalPayloadSenderV2} Sent items to server"))
+					Console.WriteLine("******************" + message);
+				if (message.StartsWith("{LocalPayloadSenderV2} Failed"))
+					Console.WriteLine("******************" + message);
+			});
+			AgentDependencies.Logger = customLogger;
 			FormsApmConfigurer.SetLoggerTargetFolder("c:/temp");
 			FormsApmConfigurer.UseApm("c:");
+
+
 
 			WmiCounters.LogInterfaceNames();
 			WmiCounters.EnableNetworkCounter(); //<-- pasar como parámetro la tarjeta de red, tal y como aparece en el log

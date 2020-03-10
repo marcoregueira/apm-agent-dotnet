@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Elastic.Apm;
 using Elastic.Apm.Api;
+using Elastic.Apm.AspNetFullFramework;
 using Elastic.Apm.Config;
 using Elastic.Apm.Helpers;
 using Elastic.Apm.Logging;
@@ -24,7 +25,7 @@ namespace Windows.Apm.Client
 		public static void UseApm(string diskDrive = null)
 		{
 			var configurationReader = new LocalConfigurationReader();
-			var logger = ConsoleLogger.LoggerOrDefault(configurationReader.LogLevel);
+			var logger = AgentDependencies.Logger ?? ConsoleLogger.LoggerOrDefault(configurationReader.LogLevel);
 			var service = Service.GetDefaultService(configurationReader, logger);
 			var systemInfoHelper = new SystemInfoHelper(logger);
 			var system = systemInfoHelper.ParseSystemInfo();
@@ -62,13 +63,12 @@ namespace Windows.Apm.Client
 					File.Delete(testFile);
 					canSave = true;
 				}
-			}
-			catch { /* nothing to do */ }
+			} catch { /* nothing to do */ }
 
 			if (canSave)
 			{
-				var target = (FileTarget)LogManager.Configuration.FindTargetByName("file");
-				var currentTarget = ((SimpleLayout)target.FileName).OriginalText.Split('/').Last();
+				var target = (FileTarget) LogManager.Configuration.FindTargetByName("file");
+				var currentTarget = ((SimpleLayout) target.FileName).OriginalText.Split('/').Last();
 				target.FileName = Path.Combine(path, currentTarget);
 				LogManager.ReconfigExistingLoggers();
 			}

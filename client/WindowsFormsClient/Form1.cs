@@ -39,7 +39,6 @@ namespace WindowsFormsClient
 					//{
 					//	s += "b";
 					//}
-					Console.WriteLine("OUT");
 				}));
 			}
 			finally
