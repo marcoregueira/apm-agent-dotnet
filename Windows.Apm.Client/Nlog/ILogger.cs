@@ -8,7 +8,7 @@ namespace Windows.Apm.Client.Nlog
 
 		void Warn(string message);
 
-		void Debug(string message);
+		void Debug(string message, object args = null);
 
 		void Error(string message);
 		void Error(string message, Exception x);

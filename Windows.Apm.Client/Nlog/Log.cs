@@ -21,11 +21,11 @@ namespace Windows.Apm.Client.Nlog
 
 		public void Warn(string message) => InternalLogger.Warn(message);
 
-		public void Debug(string message)
+		public void Debug(string message, object args = null)
 		{
 			try
 			{
-				InternalLogger.Debug(message);
+				InternalLogger.Debug(message, args);
 			}
 			catch (Exception e)
 			{
