@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\src\Elastic.Apm\Elastic.Apm.csproj" />
+    <ProjectReference Include="..\Windows.Apm.Client\Windows.Apm.Client.csproj" />
   </ItemGroup>
 
 

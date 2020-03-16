@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using Elastic.Apm.Api;
 using Elastic.Apm.Helpers;
 using Elastic.Apm.Logging;
@@ -24,7 +20,8 @@ namespace Windows.Apm.Client.Nlog
 			ParentId = parentId;
 			Transaction = new TransactionData(transaction.IsSampled, transaction.Type);
 
-			if (transaction.IsSampled) Context = transaction.Context;
+			if (transaction.IsSampled)
+				Context = transaction.Context;
 
 			IApmLogger logger = loggerArg?.Scoped($"{nameof(Error)}.{Id}");
 			logger.Trace()

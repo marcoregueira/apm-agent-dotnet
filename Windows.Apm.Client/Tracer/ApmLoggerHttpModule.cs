@@ -29,7 +29,8 @@ namespace WMS_Infrastructure.Instrumentation
 
 		public void Dispose()
 		{
-			if (Disposed) return;
+			if (Disposed)
+				return;
 		}
 
 		public ExecutionSegment GetCurrentTransaction() => HttpContext.Current.Items["__APM_TRANSACTION"] as ExecutionSegment;
@@ -40,7 +41,8 @@ namespace WMS_Infrastructure.Instrumentation
 
 		public AutoFinishingSpan InitTrasaction(string name, string type, bool getSpan = false)
 		{
-			if (!IsEnabled) return new AutoFinishingSpan(null);
+			if (!IsEnabled)
+				return new AutoFinishingSpan(null);
 			var trace = GetCurrentTransaction();
 
 			ITransaction transaction = null;
@@ -76,7 +78,8 @@ namespace WMS_Infrastructure.Instrumentation
 
 		private void FinishCommand(DbCommand command, ISpan newSpan, Stopwatch stop)
 		{
-			if (!IsEnabled) return;
+			if (!IsEnabled)
+				return;
 
 			newSpan.Context.Db = new Database
 			{
@@ -173,8 +176,6 @@ namespace WMS_Infrastructure.Instrumentation
 
 		public void LogTraceToApm(string message, string transactionId = null, string host = null, string appName = null, Dictionary<string, object> logInfo = null, string level = null, DateTime? customDate = null)
 		{
-
-			var info = new Dictionary<string, object>();
 			var trans = GetCurrentTransaction();
 			if (trans?.CurrentTransaction != null)
 			{
@@ -192,7 +193,8 @@ namespace WMS_Infrastructure.Instrumentation
 					CustomValues[pair.Key] = pair.Value;
 				}
 
-			if (!IsEnabled) return;
+			if (!IsEnabled)
+				return;
 			var culprit = appName ?? ApplicationName;
 			var now = TimeUtils.ToTimestamp(customDate) ?? TimeUtils.TimestampNow();
 			var errorLog = new LogEntry(
@@ -212,7 +214,8 @@ namespace WMS_Infrastructure.Instrumentation
 
 		public void LogExceptionToApm(Exception ex, string name, string transactionId = null, string host = null, string appName = null)
 		{
-			if (!IsEnabled) return;
+			if (!IsEnabled)
+				return;
 			var culprit = appName ?? ApplicationName;
 
 			using (var span = InitTrasaction(name, "exception", true))
@@ -241,13 +244,14 @@ namespace WMS_Infrastructure.Instrumentation
 		private void ProcessBeginRequest(object eventSender)
 		{
 			CustomValues = new Dictionary<string, object>();
-			var httpApp = (HttpApplication)eventSender;
+			var httpApp = (HttpApplication) eventSender;
 			var httpRequest = httpApp.Context.Request;
 
 			var transactionName = $"{httpRequest.HttpMethod} {httpRequest.Path}";
 
 			var soapAction = httpRequest.ExtractSoapAction(null);
-			if (soapAction != null) transactionName = $" {soapAction}";
+			if (soapAction != null)
+				transactionName = $" {soapAction}";
 
 			var transaction = InitTrasaction(transactionName, ApiConstants.TypeRequest, true);
 			SetCurrentSpan(transaction);
@@ -271,7 +275,8 @@ namespace WMS_Infrastructure.Instrumentation
 				transaction.CurrentTransaction.Labels[key] = value.ToString();
 			}
 
-			if (CustomValues == null) CustomValues = new Dictionary<string, object>();
+			if (CustomValues == null)
+				CustomValues = new Dictionary<string, object>();
 			CustomValues[key] = value;
 		}
 	}

@@ -16,6 +16,9 @@ namespace Windows.Apm.Client.Nlog
 
 		protected override void Write(LogEventInfo logEvent)
 		{
+			if (!GlobalOverrides.TraceEnabled)
+				return;
+
 			var logMessage = Layout.Render(logEvent);
 			var currentTransaction = ApmLogger.Default.GetCurrentTransaction();
 			var transactionId = currentTransaction?.CurrentTransaction?.Id;

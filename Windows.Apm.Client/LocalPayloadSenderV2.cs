@@ -16,6 +16,7 @@ using Elastic.Apm.Metrics;
 using Elastic.Apm.Model;
 using Elastic.Apm.Report.Serialization;
 using Newtonsoft.Json;
+using Windows.Apm.Client.Nlog;
 
 namespace Elastic.Apm.Report
 {
@@ -53,7 +54,8 @@ namespace Elastic.Apm.Report
 			System = system;
 
 			_metadata = new Metadata { Service = service, System = System };
-			foreach (var globalLabelKeyValue in config.GlobalLabels) _metadata.Labels.Add(globalLabelKeyValue.Key, globalLabelKeyValue.Value);
+			foreach (var globalLabelKeyValue in config.GlobalLabels)
+				_metadata.Labels.Add(globalLabelKeyValue.Key, globalLabelKeyValue.Value);
 
 			if (config.MaxQueueEventCount < config.MaxBatchEventCount)
 			{
@@ -101,6 +103,20 @@ namespace Elastic.Apm.Report
 		{
 			ThrowIfDisposed();
 
+			if (!GlobalOverrides.AnyEnabled)
+			{
+				return false;
+			}
+
+			if ((eventObj is ISpan || eventObj is ITransaction) && !GlobalOverrides.MetricsEnabled)
+				return false;
+
+			if (eventObj is IError && !GlobalOverrides.TraceEnabled)
+				return false;
+
+			if (eventObj is LogEntry && !GlobalOverrides.TraceEnabled)
+				return false;
+
 			// Enforce _maxQueueEventCount manually instead of using BatchBlock's BoundedCapacity
 			// because of the issue of Post returning false when TriggerBatch is in progress. For more details see
 			// https://stackoverflow.com/questions/35626955/unexpected-behaviour-tpl-dataflow-batchblock-rejects-items-while-triggerbatch
@@ -137,7 +153,8 @@ namespace Elastic.Apm.Report
 					+ " " + dbgEventKind + ": {" + dbgEventKind + "}."
 					, newEventQueueCount, _maxQueueEventCount, eventObj);
 
-			if (_flushInterval == TimeSpan.Zero) _eventQueue.TriggerBatch();
+			if (_flushInterval == TimeSpan.Zero)
+				_eventQueue.TriggerBatch();
 
 			return true;
 		}
@@ -155,7 +172,8 @@ namespace Elastic.Apm.Report
 				_logger.Trace()?.Log("Waiting for data to send... FlushInterval: {FlushInterval}", _flushInterval.ToHms());
 				while (true)
 				{
-					if (await TryAwaitOrTimeout(receiveAsyncTask, _flushInterval, CtsInstance.Token)) break;
+					if (await TryAwaitOrTimeout(receiveAsyncTask, _flushInterval, CtsInstance.Token))
+						break;
 
 					_eventQueue.TriggerBatch();
 				}
@@ -198,13 +216,19 @@ namespace Elastic.Apm.Report
 			}
 			finally
 			{
-				if (timeoutDelayTask != null) timeoutDelayCts.Cancel();
+				if (timeoutDelayTask != null)
+					timeoutDelayCts.Cancel();
 				timeoutDelayCts.Dispose();
 			}
 		}
 
 		private async Task ProcessQueueItems(object[] queueItems)
 		{
+			if (!GlobalOverrides.AnyEnabled)
+			{
+				return;
+			}
+
 			try
 			{
 				var ndjson = new StringBuilder();
@@ -218,18 +242,28 @@ namespace Elastic.Apm.Report
 					switch (item)
 					{
 						case Transaction _:
+							if (GlobalOverrides.TraceEnabled)
+								break;
 							ndjson.AppendLine("{\"transaction\": " + serialized + "}");
 							break;
 						case Span _:
+							if (GlobalOverrides.TraceEnabled)
+								break;
 							ndjson.AppendLine("{\"span\": " + serialized + "}");
 							break;
 						case Error _:
+							if (GlobalOverrides.TraceEnabled)
+								break;
 							ndjson.AppendLine("{\"error\": " + serialized + "}");
 							break;
 						case MetricSet _:
+							if (GlobalOverrides.MetricsEnabled)
+								break;
 							ndjson.AppendLine("{\"metricset\": " + serialized + "}");
 							break;
-						case Windows.Apm.Client.Nlog.LogEntry _:
+						case LogEntry _:
+							if (GlobalOverrides.TraceEnabled)
+								break;
 							ndjson.AppendLine("{\"log\": " + serialized + "}");
 							break;
 					}
