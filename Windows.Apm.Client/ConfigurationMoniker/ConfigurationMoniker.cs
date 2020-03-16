@@ -18,12 +18,13 @@ namespace Windows.Apm.Client
 		private static HttpClient Client { get; set; }
 
 		private static string _serviceName;
-		private static readonly object _locker = new object();
+		private static readonly SemaphoreSlim _locker = new SemaphoreSlim(1);
 
 		private static Action<ClientInfoRequest> _event;
 
 		public static void OnTrace(Action<ClientInfoRequest> onTrace) => _event = onTrace;
 
+		public static Timer TimerMoniker { get; set; }
 
 		public static void EnableMoniker(IConfigurationReader reader, bool checkInmediate = false)
 		{
@@ -33,58 +34,65 @@ namespace Windows.Apm.Client
 			};
 
 			_serviceName = reader.ServiceName;
-
-			var time = new Timer(async (e) => CheckActivationChangesAsync(e), null, 20000, 20000);
-
+			TimerMoniker = new Timer(async (e) => CheckActivationChangesAsync(e), null, 4000, 4000);
 			if (checkInmediate)
-				CheckActivationChangesAsync(null).RunSynchronously();
+				CheckActivationChangesAsync(null).Wait();
 		}
 
 		public static void DisableAll() => GlobalOverrides.DisableAll();
 
 		private static async Task CheckActivationChangesAsync(object sender)
 		{
-			var request = new ClientInfoRequest() { Client = Environment.MachineName, App = _serviceName };
-			_event?.Invoke(request);
-
-			var val = JsonConvert.SerializeObject(request);
-			var content = new StringContent(val, Encoding.UTF8, "application/x-json");
-
-			if (!Monitor.TryEnter(_locker))
-				return;
-
 			try
 			{
-				var CtsInstance = new CancellationTokenSource();
-				CtsInstance.CancelAfter(1000);
 
-				Console.WriteLine(val.ToString());
-				var result = await Client.PostAsync(ConfigEndpointUrl, content, CtsInstance.Token);
+				var request = new ClientInfoRequest() { Client = Environment.MachineName, App = _serviceName };
+				_event?.Invoke(request);
 
-				if (result != null && !result.IsSuccessStatusCode)
+				var val = JsonConvert.SerializeObject(request);
+				var content = new StringContent(val, Encoding.UTF8, "application/json");
+
+
+				if (!_locker.Wait(0))
+					return;
+
+				try
 				{
-					var responseString = await result.Content.ReadAsStringAsync();
-					var config = JsonConvert.DeserializeObject<ClientInfoResponse>(responseString);
+					var CtsInstance = new CancellationTokenSource();
+					CtsInstance.CancelAfter(1000);
 
-					if (config == null)
-						return;
+					Console.WriteLine(val.ToString());
+					var result = await Client.PostAsync(ConfigEndpointUrl, content, CtsInstance.Token);
 
-					GlobalOverrides.LogSqlEnable = config.LogSqlEnabled;
-					GlobalOverrides.TraceEnabled = config.TraceEnabled;
-					GlobalOverrides.MetricsEnabled = config.MetricsEnabled;
+					if (result != null && result.IsSuccessStatusCode)
+					{
+						var responseString = await result.Content.ReadAsStringAsync();
+						var config = JsonConvert.DeserializeObject<ClientInfoResponse>(responseString);
+
+						if (config == null)
+							return;
+
+						GlobalOverrides.LogSqlEnable = config.LogSqlEnabled;
+						GlobalOverrides.TraceEnabled = config.TraceEnabled;
+						GlobalOverrides.MetricsEnabled = config.MetricsEnabled;
+					}
+					else
+					{
+						// Logger.Instance.Debug("Error recuperando la configuración de traza remota.");
+					}
 				}
-				else
+				catch (Exception ex)
 				{
-					Logger.Instance.Debug("Error recuperando la configuración de traza remota.");
+					// Logger.Instance.Debug("Error recuperando la configuración de traza remota.", ex);
+				}
+				finally
+				{
+					_locker.Release();
 				}
 			}
 			catch (Exception ex)
 			{
-				Logger.Instance.Debug("Error recuperando la configuración de traza remota.", ex);
-			}
-			finally
-			{
-				Monitor.Exit(_locker);
+				Console.WriteLine("Moniker not working");
 			}
 		}
 	}

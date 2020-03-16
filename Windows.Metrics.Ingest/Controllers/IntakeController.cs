@@ -13,15 +13,15 @@ using Windows.Metrics.Ingest.Dto;
 namespace Windows.Metrics.Ingest.Controllers
 {
 	[ApiController]
-	public class IntakeController : ControllerBase
+	public class IntakeController : Controller
 	{
 		private readonly ILogger<IntakeController> _logger;
-		public MetricCrud Crud { get; }
+		private MetricCrud _crud { get; }
 
 		public IntakeController(ILogger<IntakeController> logger, MetricCrud crud)
 		{
 			_logger = logger;
-			Crud = crud;
+			_crud = crud;
 		}
 
 		[HttpPost("/{index}/_doc")]
@@ -75,9 +75,10 @@ namespace Windows.Metrics.Ingest.Controllers
 						Host = metadata?.Metadata?.System.HostName,
 						Metrics = JsonConvert.SerializeObject(metricValues)
 					};
-					Crud.Insert(dataDb);
+					_crud.Insert(dataDb);
 					continue;
-				} else
+				}
+				else
 				if (part.StartsWith("{\"error\":"))
 				{
 					var errorSet = JsonConvert.DeserializeObject<ErrorsetDto>(part, new ApmDateTimeConverter());
@@ -95,9 +96,10 @@ namespace Windows.Metrics.Ingest.Controllers
 						ErrorId = errorInfo.Id,
 					};
 
-					Crud.Insert(dataDb);
+					_crud.Insert(dataDb);
 					continue;
-				} else
+				}
+				else
 				if (part.StartsWith("{\"log\":"))
 				{
 					var errorSet = JsonConvert.DeserializeObject<LogDto>(part, new ApmDateTimeConverter());
@@ -150,9 +152,10 @@ namespace Windows.Metrics.Ingest.Controllers
 					if (string.IsNullOrEmpty(dataDb.User))
 						dataDb.User = "(Vacío)";
 
-					Crud.Insert(dataDb);
+					_crud.Insert(dataDb);
 					continue;
-				} else
+				}
+				else
 				if (part.StartsWith("{\"transaction\":"))
 				{
 					var errorSet = JsonConvert.DeserializeObject<TransactionDto>(part, new ApmDateTimeConverter());
@@ -175,9 +178,10 @@ namespace Windows.Metrics.Ingest.Controllers
 						Data = JsonConvert.SerializeObject(errorSet.Transaction)
 					};
 
-					Crud.Insert(dataDb);
+					_crud.Insert(dataDb);
 					continue;
-				} else
+				}
+				else
 				if (part.StartsWith("{\"span\":"))
 				{
 					var errorSet = JsonConvert.DeserializeObject<SpanDto>(part, new ApmDateTimeConverter());
@@ -197,9 +201,10 @@ namespace Windows.Metrics.Ingest.Controllers
 						Data = JsonConvert.SerializeObject(errorSet.Span)
 					};
 
-					Crud.Insert(dataDb);
+					_crud.Insert(dataDb);
 					continue;
-				} else
+				}
+				else
 				{
 					Console.WriteLine(part);
 				}

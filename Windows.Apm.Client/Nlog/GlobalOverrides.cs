@@ -3,7 +3,7 @@
 	public static class GlobalOverrides
 	{
 		public static bool TraceEnabled { get; set; } = true;
-		public static bool LogSqlEnable { get; set; } = true;
+		public static bool LogSqlEnable { get; set; } = false;
 		public static bool MetricsEnabled { get; set; } = true;
 
 		public static bool AnyEnabled => TraceEnabled || LogSqlEnable || MetricsEnabled;

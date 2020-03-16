@@ -29,6 +29,7 @@ namespace Windows.Metrics.Ingest
 				.AddControllers()
 				.AddNewtonsoftJson();
 
+			services.AddScoped<ConfigCrud>();
 			services.AddScoped<MetricCrud>();
 		}
 

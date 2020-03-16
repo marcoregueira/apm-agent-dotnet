@@ -243,28 +243,23 @@ namespace Elastic.Apm.Report
 					{
 						case Transaction _:
 							if (GlobalOverrides.TraceEnabled)
-								break;
-							ndjson.AppendLine("{\"transaction\": " + serialized + "}");
+								ndjson.AppendLine("{\"transaction\": " + serialized + "}");
 							break;
 						case Span _:
 							if (GlobalOverrides.TraceEnabled)
-								break;
-							ndjson.AppendLine("{\"span\": " + serialized + "}");
+								ndjson.AppendLine("{\"span\": " + serialized + "}");
 							break;
 						case Error _:
 							if (GlobalOverrides.TraceEnabled)
-								break;
-							ndjson.AppendLine("{\"error\": " + serialized + "}");
+								ndjson.AppendLine("{\"error\": " + serialized + "}");
 							break;
 						case MetricSet _:
 							if (GlobalOverrides.MetricsEnabled)
-								break;
-							ndjson.AppendLine("{\"metricset\": " + serialized + "}");
+								ndjson.AppendLine("{\"metricset\": " + serialized + "}");
 							break;
 						case LogEntry _:
 							if (GlobalOverrides.TraceEnabled)
-								break;
-							ndjson.AppendLine("{\"log\": " + serialized + "}");
+								ndjson.AppendLine("{\"log\": " + serialized + "}");
 							break;
 					}
 					_logger?.Trace()?.Log("Serialized item to send: {ItemToSend} as {SerializedItem}", item, serialized);

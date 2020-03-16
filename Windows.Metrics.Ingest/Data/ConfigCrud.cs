@@ -19,17 +19,6 @@ namespace Windows.Metrics.Ingest.Data
 			_connectionString = Configuration.GetConnectionString("default");
 		}
 
-		public void Insert(ClientInfoRequest data)
-		{
-			using (var connection = new NpgsqlConnection(_connectionString))
-			{
-				connection.Open();
-				connection.Execute("Insert into public.metrics (time, host, data) values (@time, @host, CAST(@metrics AS jsonb));", data);
-				//var value = connection.Query<string>("Select data ->> 'first_name' from Employee;");
-				//Console.WriteLine(value.First());
-			}
-		}
-
 		internal ClientInfoResponse GetConfig(ClientInfoRequest request)
 		{
 			using (var connection = new NpgsqlConnection(_connectionString))
@@ -49,9 +38,7 @@ namespace Windows.Metrics.Ingest.Data
 			}
 		}
 
-		private void InsertConfig(ClientInfoResponse config) => throw new NotImplementedException();
-
-		public void Insert(LogData data)
+		private void InsertConfig(ClientInfoResponse config)
 		{
 			/*
 
@@ -76,25 +63,15 @@ namespace Windows.Metrics.Ingest.Data
 			{
 				connection.Open();
 				connection.Execute(@"
-					Insert into public.log
-					(time, host, data, transactionid,
-					   database, remotehost, duration,
-					   logid, app, level, message, userid)
+					Insert into public.client_config
+					(client, app, logsqlenabled, metricsenabled, traceenabled)
 					values
-					(	@time,
-						@host,
-						CAST(@logInfo AS jsonb),
-						@transactionid,
-						@database,
-						@remotehost,
-						@duration,
-						@logid,
-						@app,
-						@level,
-						@message,
-						@user);", data);
-				//var value = connection.Query<string>("Select data ->> 'first_name' from Employee;");
-				//Console.WriteLine(value.First());
+					(	@Client,
+						@App,
+						@LogSqlEnabled,
+						@MetricsEnabled,
+						@TraceEnabled
+					)", config);
 			}
 		}
 	}

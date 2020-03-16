@@ -18,7 +18,7 @@ namespace WindowsFormsClient
 		/// The main entry point for the application.
 		/// </summary>
 		[STAThread]
-		static void Main()
+		public static void Main()
 		{
 			//Registrar nuestro conector APM en NLOG
 			Target.Register<NLogApmTarget>("apm");
@@ -27,6 +27,7 @@ namespace WindowsFormsClient
 				x.Properties["host"] = "somehost";
 				x.Properties["user"] = "marco";
 			});
+
 
 			var customLogger = new ConsoleLoggerWithEvents(LogLevel.Trace);
 			customLogger.OnTrace((level, message) =>
@@ -38,13 +39,12 @@ namespace WindowsFormsClient
 			});
 			AgentDependencies.Logger = customLogger;
 			FormsApmConfigurer.SetLoggerTargetFolder("c:/temp");
-			FormsApmConfigurer.UseApm("c:");
-
-
+			FormsApmConfigurer.UseApm("c:", true);
 
 			WmiCounters.LogInterfaceNames();
 			WmiCounters.EnableNetworkCounter(); //<-- pasar como parámetro la tarjeta de red, tal y como aparece en el log
 												//<-- si no se pasa la tarjeta, se utilizará la que tenga la mayor cuenta de bytes hasta el momento
+
 
 			Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault(false);
