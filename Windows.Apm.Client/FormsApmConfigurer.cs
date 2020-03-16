@@ -22,18 +22,23 @@ namespace Windows.Apm.Client
 	public class FormsApmConfigurer
 	{
 
-		public static void UseApm(string diskDrive = null)
+		public static void UseApm(string diskDrive = null, bool enableMoniker = false)
 		{
+
 			var configurationReader = new LocalConfigurationReader();
+
+			if (enableMoniker)
+			{
+				ConfigurationMoniker.EnableMoniker(configurationReader, true);
+			}
+
 			var logger = AgentDependencies.Logger ?? ConsoleLogger.LoggerOrDefault(configurationReader.LogLevel);
 			var service = Service.GetDefaultService(configurationReader, logger);
 			var systemInfoHelper = new SystemInfoHelper(logger);
 			var system = systemInfoHelper.ParseSystemInfo();
 
-			var centralConfigFetecher = new LocalConfigFetcher();
 			var configStore = new ConfigStore(new ConfigSnapshotFromReader(configurationReader, "local"), logger);
 			var sender = new LocalPayloadSenderV2(logger, configStore.CurrentSnapshot, service, system);
-
 			var collector = new MetricsCollector(logger, sender, configurationReader);
 
 			collector.MetricsProviders?.Add(new NetworkMetricProvider(logger));
@@ -63,7 +68,8 @@ namespace Windows.Apm.Client
 					File.Delete(testFile);
 					canSave = true;
 				}
-			} catch { /* nothing to do */ }
+			}
+			catch { /* nothing to do */ }
 
 			if (canSave)
 			{

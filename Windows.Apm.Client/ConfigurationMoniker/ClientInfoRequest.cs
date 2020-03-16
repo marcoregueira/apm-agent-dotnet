@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 
 namespace Windows.Metrics.Ingest.Dto
 {
-
 	public class ClientInfoRequest
 	{
 		public string Client { get; set; }
