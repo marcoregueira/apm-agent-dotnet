@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using Windows.Apm.Client.Nlog;
 
 namespace Elastic.Apm.Logging
 {
@@ -106,6 +107,9 @@ namespace Elastic.Apm.Logging
 				if (message.StartsWith("{LocalPayloadSenderV2} Failed"))
 					sentError = true;
 			});
+
+			//omit metrics, or the following loop will execute forever
+			GlobalOverrides.MetricsEnabled = false;
 
 			while (true)
 			{

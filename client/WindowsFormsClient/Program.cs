@@ -28,15 +28,6 @@ namespace WindowsFormsClient
 				x.Properties["user"] = "marco";
 			});
 
-			var customLogger = new LoggerActivityMonitor(LogLevel.Trace);
-			customLogger.OnTrace((level, message) =>
-			{
-				if (message.StartsWith("{LocalPayloadSenderV2} Sent items to server"))
-					Console.WriteLine("******************" + message);
-				if (message.StartsWith("{LocalPayloadSenderV2} Failed"))
-					Console.WriteLine("******************" + message);
-			});
-
 			var completionMonitor = FormsApmConfigurer.GetCompletedMonitor();
 			FormsApmConfigurer.SetLoggerTargetFolder("c:/temp");
 			FormsApmConfigurer.UseApm("c:", enableMoniker: true);
@@ -45,7 +36,6 @@ namespace WindowsFormsClient
 			WmiCounters.LogInterfaceNames();
 			WmiCounters.EnableNetworkCounter(); //<-- pasar como parámetro la tarjeta de red, tal y como aparece en el log
 												//<-- si no se pasa la tarjeta, se utilizará la que tenga la mayor cuenta de bytes hasta el momento
-
 
 			Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault(false);
