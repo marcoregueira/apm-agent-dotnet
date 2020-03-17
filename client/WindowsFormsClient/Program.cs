@@ -28,8 +28,7 @@ namespace WindowsFormsClient
 				x.Properties["user"] = "marco";
 			});
 
-
-			var customLogger = new ConsoleLoggerWithEvents(LogLevel.Trace);
+			var customLogger = new LoggerActivityMonitor(LogLevel.Trace);
 			customLogger.OnTrace((level, message) =>
 			{
 				if (message.StartsWith("{LocalPayloadSenderV2} Sent items to server"))
@@ -37,9 +36,11 @@ namespace WindowsFormsClient
 				if (message.StartsWith("{LocalPayloadSenderV2} Failed"))
 					Console.WriteLine("******************" + message);
 			});
-			AgentDependencies.Logger = customLogger;
+
+			var completionMonitor = FormsApmConfigurer.GetCompletedMonitor();
 			FormsApmConfigurer.SetLoggerTargetFolder("c:/temp");
-			FormsApmConfigurer.UseApm("c:", true);
+			FormsApmConfigurer.UseApm("c:", enableMoniker: true);
+
 
 			WmiCounters.LogInterfaceNames();
 			WmiCounters.EnableNetworkCounter(); //<-- pasar como parámetro la tarjeta de red, tal y como aparece en el log
@@ -49,6 +50,8 @@ namespace WindowsFormsClient
 			Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault(false);
 			Application.Run(new Form1());
+
+			completionMonitor.WaitForFinished(testSecondsInterval: 10);
 		}
 	}
 }

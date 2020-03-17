@@ -55,6 +55,13 @@ namespace Windows.Apm.Client
 			Agent.Setup(components);
 		}
 
+		public static IFinishedMonitor GetCompletedMonitor()
+		{
+			var customLogger = new LoggerActivityMonitor(Elastic.Apm.Logging.LogLevel.Trace);
+			AgentDependencies.Logger = customLogger;
+			return customLogger;
+		}
+
 		public static void SetLoggerTargetFolder(string path)
 		{
 			var canSave = false;

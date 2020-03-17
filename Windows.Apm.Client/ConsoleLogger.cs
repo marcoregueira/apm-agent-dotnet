@@ -1,29 +1,30 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 
 namespace Elastic.Apm.Logging
 {
-	public class ConsoleLoggerWithEvents : IApmLogger
+	public class LoggerActivityMonitor : IApmLogger, IFinishedMonitor
 	{
 		public static readonly LogLevel DefaultLogLevel = LogLevel.Error;
 		private readonly TextWriter _errorOut;
 		private readonly TextWriter _standardOut;
 
-		public ConsoleLoggerWithEvents(LogLevel level, TextWriter standardOut = null, TextWriter errorOut = null)
+		public LoggerActivityMonitor(LogLevel level, TextWriter standardOut = null, TextWriter errorOut = null)
 		{
 			Level = level;
 			_standardOut = standardOut ?? Console.Out;
 			_errorOut = errorOut ?? Console.Error;
 		}
 
-		public static ConsoleLoggerWithEvents Instance { get; } = new ConsoleLoggerWithEvents(DefaultLogLevel);
+		public static LoggerActivityMonitor Instance { get; } = new LoggerActivityMonitor(DefaultLogLevel);
 
 		private LogLevel Level { get; }
 
-		public static ConsoleLoggerWithEvents LoggerOrDefault(LogLevel? level)
+		public static LoggerActivityMonitor LoggerOrDefault(LogLevel? level)
 		{
 			if (level.HasValue && level.Value != DefaultLogLevel)
-				return new ConsoleLoggerWithEvents(level.Value);
+				return new LoggerActivityMonitor(level.Value);
 
 			return Instance;
 		}
@@ -87,6 +88,37 @@ namespace Elastic.Apm.Logging
 				case LogLevel.None:
 				default:
 					return "None";
+			}
+		}
+
+		public void WaitForFinished(int testSecondsInterval)
+		{
+			var sentOut = false;
+			var sentError = false;
+
+			var time = new Stopwatch();
+			time.Start();
+			OnTrace((level, message) =>
+			{
+				if (message.StartsWith("{LocalPayloadSenderV2} Sent items to server"))
+					sentOut = true;
+
+				if (message.StartsWith("{LocalPayloadSenderV2} Failed"))
+					sentError = true;
+			});
+
+			while (true)
+			{
+				System.Threading.Thread.Sleep(500);
+				if (time.Elapsed.TotalSeconds > testSecondsInterval)
+				{
+					time.Restart();
+					if (sentError)
+						return;
+					if (!sentOut)
+						return;
+					sentOut = false;
+				}
 			}
 		}
 	}
