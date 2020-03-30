@@ -13,7 +13,9 @@ namespace Windows.Apm.Client.Nlog
 		{
 		}
 
-		public void Info(string message) => InternalLogger.Info(message);
+		public void Trace(string message, object args = null) => InternalLogger.Trace(message, args: args);
+
+		public void Info(string message, object args = null) => InternalLogger.Info(message, args: args);
 
 		public void Warn(string message) => InternalLogger.Warn(message);
 
@@ -29,22 +31,20 @@ namespace Windows.Apm.Client.Nlog
 			}
 		}
 
-		public void Error(string message)
+		public void Error(string message, Exception ex = null, object args = null)
 		{
 			try
 			{
-				InternalLogger.Error(message);
-
+				InternalLogger.Error(ex, message, args: args);
 			}
 			catch (Exception e)
 			{
-				var ex = e.Message;
+				var exc = e.Message;
 			}
 		}
 
 		public void Error(Exception x) => InternalLogger.Error(x, x.Message);
 
-		public void Error(string message, Exception x) => InternalLogger.Error(x, message);
 
 		public void Fatal(string message) => InternalLogger.Fatal(message);
 
