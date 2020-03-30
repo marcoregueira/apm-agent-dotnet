@@ -25,7 +25,7 @@ namespace WindowsFormsClient.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Wms")]
+        [global::System.Configuration.DefaultSettingValueAttribute("Wms_Undefined")]
         public string ELASTIC_APM_SERVICE_NAME {
             get {
                 return ((string)(this["ELASTIC_APM_SERVICE_NAME"]));

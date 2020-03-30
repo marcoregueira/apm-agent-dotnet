@@ -22,7 +22,7 @@ namespace Soap1
 		public ClRequest GetPendingOutputMessages(ClRequest req)
 		{
 			Logger.Instance.Debug("Called");
-			throw new InsufficientExecutionStackException();
+			throw new InsufficientExecutionStackException("**************************************************************************************** ESTA ES UNA EXCEPCIÓN DE MENTIRA ********************************************************************************");
 			return req;
 		}
 	}

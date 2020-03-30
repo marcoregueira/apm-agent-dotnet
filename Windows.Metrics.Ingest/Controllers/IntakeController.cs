@@ -138,6 +138,9 @@ namespace Windows.Metrics.Ingest.Controllers
 						if (errorInfo.LogInfo.ContainsKey("app") && errorInfo.LogInfo["app"] != null)
 							dataDb.App = errorInfo.LogInfo["app"];
 
+						if (errorInfo.LogInfo.ContainsKey("transaction") && errorInfo.LogInfo["transaction"] != null)
+							dataDb.TransactionId = errorInfo.LogInfo["transaction"];
+
 						if (errorInfo.LogInfo.ContainsKey("duration") && errorInfo.LogInfo["duration"] != null)
 						{
 							var duration = errorInfo.LogInfo["duration"];
@@ -146,11 +149,15 @@ namespace Windows.Metrics.Ingest.Controllers
 								dataDb.Duration = ms;
 							}
 						}
-
 					}
 
 					if (string.IsNullOrEmpty(dataDb.User))
 						dataDb.User = "(Vacío)";
+
+					if (string.IsNullOrEmpty(dataDb.Database))
+						dataDb.Database = "(Vacío)";
+
+					dataDb.Duration = dataDb.Duration ?? 0;
 
 					_crud.Insert(dataDb);
 					continue;

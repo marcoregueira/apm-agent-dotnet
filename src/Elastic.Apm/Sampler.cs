@@ -62,6 +62,7 @@ namespace Elastic.Apm
 
 		public override string ToString()
 		{
+			//No changes
 			var retVal = new StringBuilder();
 			retVal.Append(nameof(Sampler));
 			retVal.Append("{ ");
