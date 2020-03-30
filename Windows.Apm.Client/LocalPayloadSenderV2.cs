@@ -108,7 +108,10 @@ namespace Elastic.Apm.Report
 				return false;
 			}
 
-			if ((eventObj is ISpan || eventObj is ITransaction) && !GlobalOverrides.MetricsEnabled)
+			if ((eventObj is ISpan || eventObj is ITransaction) && !GlobalOverrides.TraceEnabled)
+				return false;
+
+			if (eventObj is IMetricSet && !GlobalOverrides.MetricsEnabled)
 				return false;
 
 			if (eventObj is IError && !GlobalOverrides.TraceEnabled)
