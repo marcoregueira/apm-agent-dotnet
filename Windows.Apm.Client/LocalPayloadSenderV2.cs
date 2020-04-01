@@ -120,6 +120,9 @@ namespace Elastic.Apm.Report
 			if (eventObj is LogEntry && !GlobalOverrides.TraceEnabled)
 				return false;
 
+			if (eventObj is LogEntry && (!IsAcceptedLevel(eventObj as LogEntry)))
+				return false;
+
 			// Enforce _maxQueueEventCount manually instead of using BatchBlock's BoundedCapacity
 			// because of the issue of Post returning false when TriggerBatch is in progress. For more details see
 			// https://stackoverflow.com/questions/35626955/unexpected-behaviour-tpl-dataflow-batchblock-rejects-items-while-triggerbatch
@@ -160,6 +163,26 @@ namespace Elastic.Apm.Report
 				_eventQueue.TriggerBatch();
 
 			return true;
+		}
+
+		private enum LogLevel
+		{
+			Default = 0,
+			Trace = 1,
+			Debug = 2,
+			Info = 3,
+			Warn = 4,
+			Error = 5,
+			Fatal = 6
+		}
+
+		private bool IsAcceptedLevel(LogEntry logEntry)
+		{
+			if (string.IsNullOrEmpty(GlobalOverrides.LogLevel))
+				return true;
+
+			var minLog = (Enum.TryParse(logEntry.Level, true, out LogLevel val)) ? val : LogLevel.Debug;
+			return !Enum.TryParse(logEntry.Level, true, out LogLevel entryLevel) || entryLevel < minLog;
 		}
 
 		protected override async Task WorkLoopIteration() => await ProcessQueueItems(await ReceiveBatchAsync());

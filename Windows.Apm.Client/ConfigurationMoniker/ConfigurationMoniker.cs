@@ -75,6 +75,7 @@ namespace Windows.Apm.Client
 						GlobalOverrides.LogSqlEnable = config.LogSqlEnabled;
 						GlobalOverrides.TraceEnabled = config.TraceEnabled;
 						GlobalOverrides.MetricsEnabled = config.MetricsEnabled;
+						GlobalOverrides.LogLevel = config.LogLevel;
 					}
 					else
 					{

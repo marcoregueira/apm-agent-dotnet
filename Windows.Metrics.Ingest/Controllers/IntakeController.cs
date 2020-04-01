@@ -115,7 +115,7 @@ namespace Windows.Metrics.Ingest.Controllers
 						Level = errorInfo.Level,
 						//ErrorInfo = errorSet.LogInfo.ToString(),
 						TransactionId = errorInfo.Transaction_Id,
-						App = errorInfo.Culprit ?? metadata?.Metadata?.Service?.Name,
+						App = metadata?.Metadata?.Service?.Name ?? errorInfo.Culprit,
 						ParentId = errorInfo.ParentId,
 						LogId = errorInfo.Id,
 						LogInfo = JsonConvert.SerializeObject(errorInfo.LogInfo)

@@ -64,13 +64,14 @@ namespace Windows.Metrics.Ingest.Data
 				connection.Open();
 				connection.Execute(@"
 					Insert into public.client_config
-					(client, app, logsqlenabled, metricsenabled, traceenabled)
+					(client, app, logsqlenabled, metricsenabled, traceenabled, loglevel)
 					values
 					(	@Client,
 						@App,
 						@LogSqlEnabled,
 						@MetricsEnabled,
-						@TraceEnabled
+						@TraceEnabled,
+						@LogLevel
 					)", config);
 			}
 		}
