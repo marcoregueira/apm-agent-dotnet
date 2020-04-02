@@ -181,7 +181,7 @@ namespace Elastic.Apm.Report
 			if (string.IsNullOrEmpty(GlobalOverrides.LogLevel))
 				return true;
 
-			var minLog = (Enum.TryParse(logEntry.Level, true, out LogLevel val)) ? val : LogLevel.Debug;
+			var minLog = (Enum.TryParse(GlobalOverrides.LogLevel, true, out LogLevel val)) ? val : LogLevel.Debug;
 			return !Enum.TryParse(logEntry.Level, true, out LogLevel entryLevel) || entryLevel < minLog;
 		}
 
@@ -299,7 +299,7 @@ namespace Elastic.Apm.Report
 				_logger?.Debug()
 					?.Log(ndjson.ToString());
 
-				Console.WriteLine(ndjson.ToString());
+				// Console.WriteLine(ndjson.ToString());
 
 				var result = await HttpClientInstance.PostAsync(_intakeV2EventsAbsoluteUrl, content, CtsInstance.Token);
 
