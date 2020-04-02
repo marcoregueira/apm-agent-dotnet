@@ -182,7 +182,8 @@ namespace Elastic.Apm.Report
 				return true;
 
 			var minLog = (Enum.TryParse(GlobalOverrides.LogLevel, true, out LogLevel val)) ? val : LogLevel.Debug;
-			return !Enum.TryParse(logEntry.Level, true, out LogLevel entryLevel) || entryLevel < minLog;
+			var logLevel = Enum.TryParse(logEntry.Level, true, out LogLevel entryLevel) ? entryLevel : LogLevel.Debug;
+			return logLevel >= minLog;
 		}
 
 		protected override async Task WorkLoopIteration() => await ProcessQueueItems(await ReceiveBatchAsync());
