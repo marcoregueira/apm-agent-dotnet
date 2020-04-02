@@ -54,14 +54,17 @@ namespace WMS_Infrastructure.Instrumentation
 				return;
 		}
 
+		public static SemaphoreSlim _tracesSemaphore = new SemaphoreSlim(1);
+
 		public AutoFinishingSpan InitTrasaction(string name, string type, bool getSpan = false)
 		{
 			if (!IsEnabled)
 				return new AutoFinishingSpan(null);
 
 			ITransaction transaction = null;
-			lock (Traces)
+			try
 			{
+				_tracesSemaphore.Wait();
 				// si estamos en un entorno web esto tiene que depender del contexto. Funcionará mal en entornos multitarea
 				// en web quitar el lock.
 				var thread = Thread.CurrentThread;
@@ -92,6 +95,10 @@ namespace WMS_Infrastructure.Instrumentation
 						//traces.Remove(thread);
 					}
 				});
+			}
+			finally
+			{
+				_tracesSemaphore.Release();
 			}
 		}
 
@@ -185,11 +192,13 @@ namespace WMS_Infrastructure.Instrumentation
 				{
 					time.Start();
 					action.Invoke();
-				} catch (Exception ex)
+				}
+				catch (Exception ex)
 				{
 					span.CaptureException(ex);
 					throw;
-				} finally
+				}
+				finally
 				{
 					FinishCommand(command, span.Span as ISpan, time);
 				}

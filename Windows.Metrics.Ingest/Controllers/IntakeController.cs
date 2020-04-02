@@ -178,7 +178,7 @@ namespace Windows.Metrics.Ingest.Controllers
 
 						App = metadata?.Metadata?.Service?.Name,
 						Type = transactionInfo.Type,
-						Id = transactionInfo.Trace_id,
+						Id = transactionInfo.id,
 						TransactionId = transactionInfo.Trace_id,
 						Duration = transactionInfo.duration,
 						ParentId = null,
