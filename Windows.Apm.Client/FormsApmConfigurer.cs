@@ -32,7 +32,7 @@ namespace Windows.Apm.Client
 				ConfigurationMoniker.EnableMoniker(configurationReader, true);
 			}
 
-			var logger = AgentDependencies.Logger ?? ConsoleLogger.LoggerOrDefault(configurationReader.LogLevel);
+			var logger = AgentDependencies.Logger ?? ConsoleLogger.LoggerOrDefault(Elastic.Apm.Logging.LogLevel.Error);
 			var service = Service.GetDefaultService(configurationReader, logger);
 			var systemInfoHelper = new SystemInfoHelper(logger);
 			var system = systemInfoHelper.ParseSystemInfo();
