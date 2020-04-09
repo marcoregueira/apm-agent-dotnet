@@ -32,7 +32,7 @@ namespace Libertis.WMS_WS.Code
 
 			var type = typeof(SoapExceptionHandler);
 			var priority = 1;
-			var group = PriorityGroup.Low;
+			var group = PriorityGroup.High;
 
 			if (!type.IsSubclassOf(typeof(SoapExtension)))
 			{

@@ -86,6 +86,7 @@ namespace Windows.Metrics.Ingest.Dto
 			public DateTime Timestamp { get; set; }           //                    1581631012472065,
 			public string Trace_id { get; set; }              //              "76d01eaf4700f78dbf06c68b035f9f27",
 			public string Type { get; set; }                    //     "request"}
+			public string Result { get; set; }                    //     "request"}
 			public ContextDto Context { get; set; }
 		}
 

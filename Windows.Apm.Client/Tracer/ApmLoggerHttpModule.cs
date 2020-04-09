@@ -3,6 +3,7 @@ using Elastic.Apm.Api;
 using Elastic.Apm.AspNetFullFramework;
 using Elastic.Apm.AspNetFullFramework.Extensions;
 using Elastic.Apm.Helpers;
+using Elastic.Apm.Model;
 using Elastic.Apm.Report;
 using System;
 using System.Collections.Generic;
@@ -218,8 +219,16 @@ namespace WMS_Infrastructure.Instrumentation
 				return;
 			var culprit = appName ?? ApplicationName;
 
-			using (var span = InitTrasaction(name, "exception", true))
-				span.CaptureException(ex, culprit);
+			var transaction = GetCurrentTransaction();
+			if (transaction != null)
+			{
+				transaction.CurrentTransaction.CaptureException(ex, culprit);
+			}
+			else
+				using (var span = InitTrasaction(name, "exception", true))
+				{
+					span.CaptureException(ex, culprit);
+				}
 		}
 
 		public void Init(HttpApplication httpApp)
@@ -260,6 +269,8 @@ namespace WMS_Infrastructure.Instrumentation
 
 		private void OnEndRequest(object eventSender, EventArgs eventArgs)
 		{
+			ProcessEndRequest(eventSender);
+
 			var currentSpan = GetCurrentSpan();
 			SetCurrentSpan(null);
 			currentSpan?.Dispose();
@@ -279,5 +290,58 @@ namespace WMS_Infrastructure.Instrumentation
 				CustomValues = new Dictionary<string, object>();
 			CustomValues[key] = value;
 		}
+
+		private void ProcessEndRequest(object eventSender)
+		{
+			var httpApp = (HttpApplication) eventSender;
+			var httpCtx = httpApp.Context;
+			var httpResponse = httpCtx.Response;
+
+			var _currentTransaction = GetCurrentTransaction()?.CurrentTransaction;
+
+			if (_currentTransaction == null)
+				return;
+
+			SendErrorEventIfPresent(httpCtx);
+
+			_currentTransaction.Result = Transaction.StatusCodeToResult("HTTP", httpResponse.StatusCode);
+
+			if (_currentTransaction.IsSampled)
+			{
+				FillSampledTransactionContextResponse(httpResponse, _currentTransaction);
+				FillSampledTransactionContextUser(httpCtx, _currentTransaction);
+			}
+
+			_currentTransaction.End();
+			_currentTransaction = null;
+		}
+
+		private void SendErrorEventIfPresent(HttpContext httpCtx)
+		{
+			var lastError = httpCtx.Server.GetLastError();
+			var _currentTransaction = GetCurrentTransaction().CurrentTransaction;
+			if (lastError != null)
+				_currentTransaction.CaptureException(lastError);
+		}
+
+		private static void FillSampledTransactionContextResponse(HttpResponse httpResponse, ITransaction transaction) =>
+			transaction.Context.Response = new Response
+			{
+				Finished = true,
+				StatusCode = httpResponse.StatusCode,
+				//Headers = _isCaptureHeadersEnabled ? ConvertHeaders(httpResponse.Headers) : null
+			};
+
+		private void FillSampledTransactionContextUser(HttpContext httpCtx, ITransaction transaction)
+		{
+			var userIdentity = httpCtx.User?.Identity;
+			if (userIdentity == null || !userIdentity.IsAuthenticated)
+				return;
+
+			transaction.Context.User = new User { UserName = userIdentity.Name };
+
+			//_logger.Debug()?.Log("Captured user - {CapturedUser}", transaction.Context.User);
+		}
+
 	}
 }

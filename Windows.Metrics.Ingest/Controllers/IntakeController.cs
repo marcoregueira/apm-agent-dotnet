@@ -91,7 +91,8 @@ namespace Windows.Metrics.Ingest.Controllers
 						Host = metadata?.Metadata?.System.HostName,
 						ErrorInfo = errorSet.Error.ToString(),
 						TransactionId = errorInfo.Transaction_Id,
-						App = errorInfo.Culprit,
+						//App = errorInfo.Culprit,
+						App = metadata?.Metadata?.Service?.Name ?? errorInfo.Culprit,
 						ParentId = errorInfo.ParentId,
 						ErrorId = errorInfo.Id,
 					};
@@ -178,9 +179,11 @@ namespace Windows.Metrics.Ingest.Controllers
 
 						App = metadata?.Metadata?.Service?.Name,
 						Type = transactionInfo.Type,
-						Id = transactionInfo.id,
-						TransactionId = transactionInfo.Trace_id,
-						Duration = transactionInfo.duration,
+						Id = transactionInfo.Trace_id,
+						TransactionId = transactionInfo.id,
+						Duration = Math.Round(transactionInfo.duration),
+						Result = transactionInfo.Result,
+						Name= transactionInfo.name,
 						ParentId = null,
 						Data = JsonConvert.SerializeObject(errorSet.Transaction)
 					};

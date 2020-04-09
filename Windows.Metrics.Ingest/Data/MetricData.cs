@@ -48,7 +48,9 @@ namespace Windows.Metrics.Ingest.Data
 		public string Id { get; set; }
 		public string TransactionId { get; set; }
 		public string ParentId { get; set; }
+		public string Result { get; set; }
 		public decimal Duration { get; set; }
 		public object Data { get; set; }
+		public string Name { get; set; }
 	}
 }

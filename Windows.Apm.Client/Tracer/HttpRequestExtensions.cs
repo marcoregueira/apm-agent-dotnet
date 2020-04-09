@@ -28,7 +28,8 @@ namespace Elastic.Apm.AspNetFullFramework.Extensions
 			}
 			catch (Exception e)
 			{
-				logger.Error()?.LogException(e, "Error reading soap action header");
+				if (logger != null)
+					logger.Error()?.LogException(e, "Error reading soap action header");
 			}
 
 			return null;
@@ -38,8 +39,10 @@ namespace Elastic.Apm.AspNetFullFramework.Extensions
 		{
 			//[{"key":"Content-Type","value":"application/soap+xml; charset=utf-8"}]
 			var contentType = request.Headers.Get(ContentTypeHeaderName);
-			if (contentType?.Contains(SoapAction12ContentType) != true) return null;
-			if (!request.InputStream.CanSeek) return null;
+			if (contentType?.Contains(SoapAction12ContentType) != true)
+				return null;
+			if (!request.InputStream.CanSeek)
+				return null;
 
 			try
 			{
@@ -63,7 +66,8 @@ namespace Elastic.Apm.AspNetFullFramework.Extensions
 			if (!string.IsNullOrWhiteSpace(soapActionWithNamespace))
 			{
 				var indexPosition = soapActionWithNamespace.LastIndexOf(@"/", StringComparison.InvariantCulture);
-				if (indexPosition != -1) return soapActionWithNamespace.Substring(indexPosition + 1).TrimEnd('\"');
+				if (indexPosition != -1)
+					return soapActionWithNamespace.Substring(indexPosition + 1).TrimEnd('\"');
 			}
 			return null;
 		}
