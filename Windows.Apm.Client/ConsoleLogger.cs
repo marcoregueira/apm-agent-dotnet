@@ -97,13 +97,11 @@ namespace Elastic.Apm.Logging
 			var sentOut = false;
 			var sentError = false;
 
-
 			//omit metrics, or the following loop will execute forever
 			GlobalOverrides.MetricsEnabled = false;
 			GlobalOverrides.ForceDisableMetrics = true;
 			GlobalOverrides.ConfigurationMonikerEnabled = false;
 			if (!GlobalOverrides.AnyEnabled) return;
-
 
 			Console.WriteLine("APLICACIÓN COMPLETADA. ESPERANDO A QUE SE ENVÍEN TODOS LOS EVENTOS AL SERVIDOR APM");
 			var time = new Stopwatch();
@@ -126,22 +124,23 @@ namespace Elastic.Apm.Logging
 
 			try
 			{
+				Console.WriteLine($"ESPERANDO {testSecondsInterval} segundos");
 
 				while (true)
 				{
 					if (!GlobalOverrides.AnyEnabled) return;
 
-					Console.WriteLine($"ESPERANDO {testSecondsInterval} segundos");
-
 					System.Threading.Thread.Sleep(500);
 					if (time.Elapsed.TotalSeconds > testSecondsInterval)
 					{
-						time.Restart();
 						if (sentError)
 							return;
 
 						if (!sentOut)
 							return;
+
+						Console.WriteLine($"ESPERANDO {testSecondsInterval} segundos");
+						time.Restart();
 						sentOut = false;
 					}
 				}
