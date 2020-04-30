@@ -281,7 +281,7 @@ namespace Elastic.Apm.Report
 								ndjson.AppendLine("{\"error\": " + serialized + "}");
 							break;
 						case MetricSet _:
-							if (GlobalOverrides.MetricsEnabled)
+							if (GlobalOverrides.MetricsEnabled && !GlobalOverrides.ForceDisableMetrics)
 								ndjson.AppendLine("{\"metricset\": " + serialized + "}");
 							break;
 						case LogEntry _:

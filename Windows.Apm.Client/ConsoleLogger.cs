@@ -45,7 +45,7 @@ namespace Elastic.Apm.Logging
 			var message = formatter(state, e);
 
 			_event?.Invoke(level, message);
-
+			return;
 			var fullMessage = $"[{dateTime:yyyy-MM-dd HH:mm:ss.fff zzz}][{LevelToString(level)}] - {message}";
 			if (e != null)
 				fullMessage += $"{Environment.NewLine}+-> Exception: {e.GetType().FullName}: {e.Message}{Environment.NewLine}{e.StackTrace}";
@@ -97,32 +97,58 @@ namespace Elastic.Apm.Logging
 			var sentOut = false;
 			var sentError = false;
 
+
+			//omit metrics, or the following loop will execute forever
+			GlobalOverrides.MetricsEnabled = false;
+			GlobalOverrides.ForceDisableMetrics = true;
+			GlobalOverrides.ConfigurationMonikerEnabled = false;
+			if (!GlobalOverrides.AnyEnabled) return;
+
+
+			Console.WriteLine("APLICACIÓN COMPLETADA. ESPERANDO A QUE SE ENVÍEN TODOS LOS EVENTOS AL SERVIDOR APM");
 			var time = new Stopwatch();
 			time.Start();
 			OnTrace((level, message) =>
 			{
 				if (message.StartsWith("{LocalPayloadSenderV2} Sent items to server"))
+				{
+					Console.WriteLine("SE HA ENVIADO UN GRUPO DE REGISTROS A APM");
 					sentOut = true;
+				}
 
 				if (message.StartsWith("{LocalPayloadSenderV2} Failed"))
+				{
 					sentError = true;
+					Console.WriteLine("HA FALLADO EL ENVÍO DE REGISTROS");
+				}
 			});
 
-			//omit metrics, or the following loop will execute forever
-			GlobalOverrides.MetricsEnabled = false;
 
-			while (true)
+			try
 			{
-				System.Threading.Thread.Sleep(500);
-				if (time.Elapsed.TotalSeconds > testSecondsInterval)
+
+				while (true)
 				{
-					time.Restart();
-					if (sentError)
-						return;
-					if (!sentOut)
-						return;
-					sentOut = false;
+					if (!GlobalOverrides.AnyEnabled) return;
+
+					Console.WriteLine($"ESPERANDO {testSecondsInterval} segundos");
+
+					System.Threading.Thread.Sleep(500);
+					if (time.Elapsed.TotalSeconds > testSecondsInterval)
+					{
+						time.Restart();
+						if (sentError)
+							return;
+
+						if (!sentOut)
+							return;
+						sentOut = false;
+					}
 				}
+			}
+			finally
+			{
+				Console.WriteLine("ENVÍO FINALIZADO");
 			}
 		}
 	}

@@ -33,8 +33,10 @@ namespace Windows.Apm.Client
 				BaseAddress = reader.ServerUrls.FirstOrDefault()
 			};
 
+
 			_serviceName = reader.ServiceName;
 			TimerMoniker = new Timer(async (e) => CheckActivationChangesAsync(e), null, 4000, 4000);
+			GlobalOverrides.ConfigurationMonikerEnabled = true;
 			if (checkInmediate)
 				CheckActivationChangesAsync(null).Wait();
 		}
@@ -45,6 +47,8 @@ namespace Windows.Apm.Client
 		{
 			try
 			{
+
+				if (!GlobalOverrides.ConfigurationMonikerEnabled) return;
 
 				var request = new ClientInfoRequest() { Client = Environment.MachineName, App = _serviceName };
 				_event?.Invoke(request);
