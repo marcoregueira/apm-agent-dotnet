@@ -19,6 +19,8 @@ namespace Windows.Apm.Client.Metrics
 		public int ConsecutiveNumberOfFailedReads { get; set; }
 		public string DbgName => "custom network traffic";
 
+		public bool IsMetricAlreadyCaptured => false;
+
 		public NetworkMetricProvider(IApmLogger logger = null) => _logger = logger;
 
 		public IEnumerable<MetricSample> GetSamples()

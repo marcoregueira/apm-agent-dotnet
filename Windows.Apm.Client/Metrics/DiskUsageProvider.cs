@@ -73,6 +73,7 @@ namespace Windows.Apm.Client.Metrics
 		public int ConsecutiveNumberOfFailedReads { get; set; }
 		public string DbgName => "total disk space";
 
+		public bool IsMetricAlreadyCaptured => false;
 
 		private StreamReader GetProcStatAsStream()
 			=> _procStatStreamReader ?? (File.Exists("/proc/stat") ? new StreamReader("/proc/stat") : null);

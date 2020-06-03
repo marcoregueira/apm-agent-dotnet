@@ -41,6 +41,11 @@ namespace Elastic.Apm.Report
 
 		private readonly PayloadItemSerializer _payloadItemSerializer;
 
+		internal readonly List<Func<ITransaction, ITransaction>> TransactionFilters = new List<Func<ITransaction, ITransaction>>();
+		internal readonly List<Func<ISpan, ISpan>> SpanFilters = new List<Func<ISpan, ISpan>>();
+		internal readonly List<Func<IError, IError>> ErrorFilters = new List<Func<IError, IError>>();
+		internal readonly List<Func<LogEntry, LogEntry>> LoggerFilters = new List<Func<LogEntry, LogEntry>>();
+
 		public LocalPayloadSenderV2(IApmLogger logger, IConfigSnapshot config, Service service, Api.System system,
 			HttpMessageHandler httpMessageHandler = null, string dbgName = null
 		)
@@ -54,8 +59,7 @@ namespace Elastic.Apm.Report
 			System = system;
 
 			_metadata = new Metadata { Service = service, System = System };
-			foreach (var globalLabelKeyValue in config.GlobalLabels)
-				_metadata.Labels.Add(globalLabelKeyValue.Key, globalLabelKeyValue.Value);
+			foreach (var globalLabelKeyValue in config.GlobalLabels) _metadata.Labels.Add(globalLabelKeyValue.Key, globalLabelKeyValue.Value);
 
 			if (config.MaxQueueEventCount < config.MaxBatchEventCount)
 			{
@@ -103,11 +107,15 @@ namespace Elastic.Apm.Report
 		{
 			ThrowIfDisposed();
 
-			if (!GlobalOverrides.AnyEnabled)
-			{
-				return false;
-			}
 
+			// Vamos a desligar log de trazas. 
+			// if (!GlobalOverrides.AnyEnabled)
+			// {
+			// 	return false;
+			// }
+
+
+			//TODO: RECODIFICAR CON 
 			if ((eventObj is ISpan || eventObj is ITransaction) && !GlobalOverrides.TraceEnabled)
 				return false;
 
@@ -117,8 +125,8 @@ namespace Elastic.Apm.Report
 			if (eventObj is IError && !GlobalOverrides.TraceEnabled)
 				return false;
 
-			if (eventObj is LogEntry && !GlobalOverrides.TraceEnabled)
-				return false;
+			// if (eventObj is LogEntry && !GlobalOverrides.TraceEnabled)
+			// 	return false;
 
 			if (eventObj is LogEntry && (!IsAcceptedLevel(eventObj as LogEntry)))
 				return false;
@@ -159,8 +167,7 @@ namespace Elastic.Apm.Report
 					+ " " + dbgEventKind + ": {" + dbgEventKind + "}."
 					, newEventQueueCount, _maxQueueEventCount, eventObj);
 
-			if (_flushInterval == TimeSpan.Zero)
-				_eventQueue.TriggerBatch();
+			if (_flushInterval == TimeSpan.Zero) _eventQueue.TriggerBatch();
 
 			return true;
 		}
@@ -268,25 +275,25 @@ namespace Elastic.Apm.Report
 					var serialized = _payloadItemSerializer.SerializeObject(item);
 					switch (item)
 					{
-						case Transaction _:
+						case Transaction transaction:
 							if (GlobalOverrides.TraceEnabled)
-								ndjson.AppendLine("{\"transaction\": " + serialized + "}");
+								if (TryExecuteFilter(TransactionFilters, transaction) != null) SerializeAndSend(item, "transaction");
 							break;
-						case Span _:
+						case Span span:
 							if (GlobalOverrides.TraceEnabled)
-								ndjson.AppendLine("{\"span\": " + serialized + "}");
+								if (TryExecuteFilter(SpanFilters, span) != null) SerializeAndSend(item, "span");
 							break;
-						case Error _:
+						case Error error:
 							if (GlobalOverrides.TraceEnabled)
-								ndjson.AppendLine("{\"error\": " + serialized + "}");
+								if (TryExecuteFilter(ErrorFilters, error) != null) SerializeAndSend(item, "error");
 							break;
 						case MetricSet _:
 							if (GlobalOverrides.MetricsEnabled && !GlobalOverrides.ForceDisableMetrics)
-								ndjson.AppendLine("{\"metricset\": " + serialized + "}");
+								SerializeAndSend(item, "metricset");
 							break;
 						case LogEntry _:
 							if (GlobalOverrides.TraceEnabled)
-								ndjson.AppendLine("{\"log\": " + serialized + "}");
+								SerializeAndSend(item, "log");
 							break;
 					}
 					_logger?.Trace()?.Log("Serialized item to send: {ItemToSend} as {SerializedItem}", item, serialized);
@@ -319,6 +326,13 @@ namespace Elastic.Apm.Report
 						?.Log("Sent items to server:\n{SerializedItems}",
 							TextUtils.Indent(string.Join($",{Environment.NewLine}", queueItems.ToArray())));
 				}
+
+				void SerializeAndSend(object item, string eventType)
+				{
+					var serialized = _payloadItemSerializer.SerializeObject(item);
+					ndjson.AppendLine($"{{\"{eventType}\": " + serialized + "}");
+					_logger?.Trace()?.Log("Serialized item to send: {ItemToSend} as {SerializedItem}", item, serialized);
+				}
 			}
 			catch (Exception e)
 			{
@@ -330,6 +344,39 @@ namespace Elastic.Apm.Report
 						, TextUtils.Indent(string.Join($",{Environment.NewLine}", queueItems.ToArray()))
 					);
 			}
+
+
+			// Executes filters for the given filter collection and handles return value and errors
+			T TryExecuteFilter<T>(IEnumerable<Func<T, T>> filters, T item) where T : class
+			{
+				var enumerable = filters as Func<T, T>[] ?? filters.ToArray();
+				if (!enumerable.Any()) return item;
+
+				foreach (var filter in enumerable)
+				{
+					try
+					{
+						_logger?.Trace()?.Log("Start executing filter on transaction");
+						var itemAfterFilter = filter(item);
+						if (itemAfterFilter != null)
+						{
+							item = itemAfterFilter;
+							continue;
+						}
+
+						_logger?.Debug()?.Log("Filter returns false, item won't be sent, {filteredItem}", item);
+						return null;
+					}
+					catch (Exception e)
+					{
+						_logger.Warning()?.LogException(e, "Exception during execution of the filter on transaction");
+					}
+				}
+
+				return item;
+			}
+
+
 		}
 	}
 

@@ -10,4 +10,12 @@ namespace Windows.Metrics.Ingest.Dto
 		public string Client { get; set; }
 		public string App { get; set; }
 	}
+
+	public class ClientInfoDetails
+	{
+		public string Client { get; set; }
+		public string App { get; set; }
+
+		public Dictionary<string, string> Labels = new Dictionary<string, string>();
+	}
 }
