@@ -1,3 +1,7 @@
+// Licensed to Elasticsearch B.V under one or more agreements.
+// Elasticsearch B.V licenses this file to you under the Apache 2.0 License.
+// See the LICENSE file in the project root for more information
+
 using Elastic.Apm.Report.Serialization;
 using Newtonsoft.Json;
 
@@ -44,6 +48,8 @@ namespace Elastic.Apm.Api
 			if (!_address.HasValue) _address = src._address;
 			if (!_port.HasValue) _port = src._port;
 		}
+
+		internal bool AddressHasValue => _address.HasValue;
 
 		/// <summary>
 		/// The goal is to allow public API user to prohibit automatic deduction of any of  `context.destination` properties.

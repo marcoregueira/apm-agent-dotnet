@@ -1,3 +1,7 @@
+// Licensed to Elasticsearch B.V under one or more agreements.
+// Elasticsearch B.V licenses this file to you under the Apache 2.0 License.
+// See the LICENSE file in the project root for more information
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -24,6 +28,12 @@ namespace Elastic.Apm.Config
 
 		private readonly LazyContextualInit<IReadOnlyList<WildcardMatcher>> _cachedWildcardMatchersSanitizeFieldNames =
 			new LazyContextualInit<IReadOnlyList<WildcardMatcher>>();
+
+		private readonly LazyContextualInit<IReadOnlyList<string>> _cachedExcludedNamespaces =
+			new LazyContextualInit<IReadOnlyList<string>>();
+
+		private readonly LazyContextualInit<IReadOnlyList<string>> _cachedApplicationNamespaces =
+			new LazyContextualInit<IReadOnlyList<string>>();
 
 		private readonly IApmLogger _logger;
 
@@ -114,6 +124,13 @@ namespace Elastic.Apm.Config
 		}
 
 		protected string ParseSecretToken(ConfigurationKeyValue kv)
+		{
+			if (kv == null || string.IsNullOrEmpty(kv.Value)) return null;
+
+			return kv.Value;
+		}
+
+		protected string ParseApiKey(ConfigurationKeyValue kv)
 		{
 			if (kv == null || string.IsNullOrEmpty(kv.Value)) return null;
 
@@ -804,6 +821,42 @@ namespace Elastic.Apm.Config
 			}
 
 			return result.ToString();
+		}
+
+		protected IReadOnlyList<string> ParseExcludedNamespaces(ConfigurationKeyValue kv) =>
+			_cachedExcludedNamespaces.IfNotInited?.InitOrGet(() => ParseExcludedNamespacesImpl(kv)) ?? _cachedExcludedNamespaces.Value;
+
+		private IReadOnlyList<string> ParseExcludedNamespacesImpl(ConfigurationKeyValue kv)
+		{
+			if (kv == null || string.IsNullOrEmpty(kv.Value)) return LogAndReturnDefault().AsReadOnly();
+
+			var list = kv.Value.Split(',').ToList();
+
+			return list.Count == 0 ? LogAndReturnDefault().AsReadOnly() : list.Select(n => n.Trim()).ToList().AsReadOnly();
+
+			List<string> LogAndReturnDefault()
+			{
+				_logger?.Debug()?.Log("Using default excluded namespaces: {ExcludedNamespaces}", DefaultValues.DefaultExcludedNamespaces);
+				return DefaultValues.DefaultExcludedNamespaces.ToList();
+			}
+		}
+
+		protected IReadOnlyList<string> ParseApplicationNamespaces(ConfigurationKeyValue kv) =>
+			_cachedApplicationNamespaces.IfNotInited?.InitOrGet(() => ParseApplicationNamespacesImpl(kv)) ?? _cachedApplicationNamespaces.Value;
+
+		private IReadOnlyList<string> ParseApplicationNamespacesImpl(ConfigurationKeyValue kv)
+		{
+			if (kv == null || string.IsNullOrEmpty(kv.Value)) return LogAndReturnDefault().AsReadOnly();
+
+			var list = kv.Value.Split(',').ToList();
+
+			return list.Count == 0 ? LogAndReturnDefault().AsReadOnly() : list.Select(n => n.Trim()).ToList().AsReadOnly();
+
+			List<string> LogAndReturnDefault()
+			{
+				_logger?.Debug()?.Log("Using default application namespaces: {ApplicationNamespaces}", DefaultValues.DefaultApplicationNamespaces);
+				return DefaultValues.DefaultApplicationNamespaces.ToList();
+			}
 		}
 
 		protected string ReadEnvVarValue(string envVarName) => Environment.GetEnvironmentVariable(envVarName)?.Trim();

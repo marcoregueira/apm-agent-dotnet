@@ -1,3 +1,7 @@
+// Licensed to Elasticsearch B.V under one or more agreements.
+// Elasticsearch B.V licenses this file to you under the Apache 2.0 License.
+// See the LICENSE file in the project root for more information
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -22,6 +26,9 @@ using Microsoft.AspNetCore.Routing;
 [assembly:
 	InternalsVisibleTo(
 		"Elastic.Apm.AspNetCore.Tests, PublicKey=002400000480000094000000060200000024000052534131000400000100010051df3e4d8341d66c6dfbf35b2fda3627d08073156ed98eef81122b94e86ef2e44e7980202d21826e367db9f494c265666ae30869fb4cd1a434d171f6b634aa67fa8ca5b9076d55dc3baa203d3a23b9c1296c9f45d06a45cf89520bef98325958b066d8c626db76dd60d0508af877580accdd0e9f88e46b6421bf09a33de53fe1")]
+[assembly:
+	InternalsVisibleTo(
+		"Elastic.Apm.PerfTests, PublicKey=002400000480000094000000060200000024000052534131000400000100010051df3e4d8341d66c6dfbf35b2fda3627d08073156ed98eef81122b94e86ef2e44e7980202d21826e367db9f494c265666ae30869fb4cd1a434d171f6b634aa67fa8ca5b9076d55dc3baa203d3a23b9c1296c9f45d06a45cf89520bef98325958b066d8c626db76dd60d0508af877580accdd0e9f88e46b6421bf09a33de53fe1")]
 
 namespace Elastic.Apm.AspNetCore
 {
@@ -79,45 +86,40 @@ namespace Elastic.Apm.AspNetCore
 				Transaction transaction;
 				var transactionName = $"{context.Request.Method} {context.Request.Path}";
 
-				if (context.Request.Headers.ContainsKey(DistributedTracing.TraceContext.TraceParentHeaderNamePrefixed)
-					|| context.Request.Headers.ContainsKey(DistributedTracing.TraceContext.TraceParentHeaderName))
+				if (context.Request.Headers.ContainsKey(TraceContext.TraceParentHeaderNamePrefixed)
+					|| context.Request.Headers.ContainsKey(TraceContext.TraceParentHeaderName))
 				{
-					var headerValue = context.Request.Headers.ContainsKey(DistributedTracing.TraceContext.TraceParentHeaderName)
-						? context.Request.Headers[DistributedTracing.TraceContext.TraceParentHeaderName].ToString()
-						: context.Request.Headers[DistributedTracing.TraceContext.TraceParentHeaderNamePrefixed].ToString();
+					var headerValue = context.Request.Headers.ContainsKey(TraceContext.TraceParentHeaderName)
+						? context.Request.Headers[TraceContext.TraceParentHeaderName].ToString()
+						: context.Request.Headers[TraceContext.TraceParentHeaderNamePrefixed].ToString();
 
-					var tracingData = context.Request.Headers.ContainsKey(DistributedTracing.TraceContext.TraceStateHeaderName)
-						? DistributedTracing.TraceContext.TryExtractTracingData(headerValue, context.Request.Headers[DistributedTracing.TraceContext.TraceStateHeaderName].ToString())
-						: DistributedTracing.TraceContext.TryExtractTracingData(headerValue);
+					var tracingData = context.Request.Headers.ContainsKey(TraceContext.TraceStateHeaderName)
+						? TraceContext.TryExtractTracingData(headerValue, context.Request.Headers[TraceContext.TraceStateHeaderName].ToString())
+						: TraceContext.TryExtractTracingData(headerValue);
 
 					if (tracingData != null)
 					{
 						_logger.Debug()
 							?.Log(
 								"Incoming request with {TraceParentHeaderName} header. DistributedTracingData: {DistributedTracingData}. Continuing trace.",
-								DistributedTracing.TraceContext.TraceParentHeaderNamePrefixed, tracingData);
+								TraceContext.TraceParentHeaderNamePrefixed, tracingData);
 
-						transaction = _tracer.StartTransactionInternal(
-							transactionName,
-							ApiConstants.TypeRequest,
-							tracingData);
+						transaction = _tracer.StartTransactionInternal(transactionName, ApiConstants.TypeRequest, tracingData);
 					}
 					else
 					{
 						_logger.Debug()
 							?.Log(
 								"Incoming request with invalid {TraceParentHeaderName} header (received value: {TraceParentHeaderValue}). Starting trace with new trace id.",
-								DistributedTracing.TraceContext.TraceParentHeaderNamePrefixed, headerValue);
+								TraceContext.TraceParentHeaderNamePrefixed, headerValue);
 
-						transaction = _tracer.StartTransactionInternal(transactionName,
-							ApiConstants.TypeRequest);
+						transaction = _tracer.StartTransactionInternal(transactionName, ApiConstants.TypeRequest);
 					}
 				}
 				else
 				{
 					_logger.Debug()?.Log("Incoming request. Starting Trace.");
-					transaction = _tracer.StartTransactionInternal(transactionName,
-						ApiConstants.TypeRequest);
+					transaction = _tracer.StartTransactionInternal(transactionName, ApiConstants.TypeRequest);
 				}
 
 				return transaction;

@@ -1,7 +1,12 @@
+// Licensed to Elasticsearch B.V under one or more agreements.
+// Elasticsearch B.V licenses this file to you under the Apache 2.0 License.
+// See the LICENSE file in the project root for more information
+
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data;
+using Elastic.Apm.Api;
 using Elastic.Apm.DiagnosticSource;
 using Elastic.Apm.Helpers;
 using Elastic.Apm.Logging;
@@ -45,20 +50,26 @@ namespace Elastic.Apm.SqlClient
 		// prefix - Microsoft.Data.SqlClient. or System.Data.SqlClient.
 		public void OnNext(KeyValuePair<string, object> value)
 		{
-			if (value.Key.StartsWith("Microsoft.Data.SqlClient.") || value.Key.StartsWith("System.Data.SqlClient."))
+			// check for competing instrumentation
+			if (_apmAgent.TracerInternal.CurrentSpan is Span span)
 			{
-				switch (value.Key)
-				{
-					case string s when s.EndsWith("WriteCommandBefore") && _apmAgent.Tracer.CurrentTransaction != null:
-						HandleStartCommand(value.Value, value.Key.StartsWith("System") ? _systemPropertyFetcherSet : _microsoftPropertyFetcherSet);
-						break;
-					case string s when s.EndsWith("WriteCommandAfter"):
-						HandleStopCommand(value.Value, value.Key.StartsWith("System") ? _systemPropertyFetcherSet : _microsoftPropertyFetcherSet);
-						break;
-					case string s when s.EndsWith("WriteCommandError"):
-						HandleErrorCommand(value.Value, value.Key.StartsWith("System") ? _systemPropertyFetcherSet : _microsoftPropertyFetcherSet);
-						break;
-				}
+				if (span.InstrumentationFlag == InstrumentationFlag.EfCore || span.InstrumentationFlag == InstrumentationFlag.EfClassic)
+					return;
+			}
+
+			if (!value.Key.StartsWith("Microsoft.Data.SqlClient.") && !value.Key.StartsWith("System.Data.SqlClient.")) return;
+
+			switch (value.Key)
+			{
+				case { } s when s.EndsWith("WriteCommandBefore") && _apmAgent.Tracer.CurrentTransaction != null:
+					HandleStartCommand(value.Value, value.Key.StartsWith("System") ? _systemPropertyFetcherSet : _microsoftPropertyFetcherSet);
+					break;
+				case { } s when s.EndsWith("WriteCommandAfter"):
+					HandleStopCommand(value.Value, value.Key.StartsWith("System") ? _systemPropertyFetcherSet : _microsoftPropertyFetcherSet);
+					break;
+				case { } s when s.EndsWith("WriteCommandError"):
+					HandleErrorCommand(value.Value, value.Key.StartsWith("System") ? _systemPropertyFetcherSet : _microsoftPropertyFetcherSet);
+					break;
 			}
 		}
 
@@ -69,7 +80,8 @@ namespace Elastic.Apm.SqlClient
 				if (propertyFetcherSet.StartCorrelationId.Fetch(payloadData) is Guid operationId
 					&& propertyFetcherSet.StartCommand.Fetch(payloadData) is IDbCommand dbCommand)
 				{
-					var span = _apmAgent.TracerInternal.DbSpanCommon.StartSpan(_apmAgent, dbCommand);
+					var span = _apmAgent.TracerInternal.DbSpanCommon.StartSpan(_apmAgent, dbCommand, InstrumentationFlag.SqlClient,
+						ApiConstants.SubtypeMssql);
 					_spans.TryAdd(operationId, span);
 				}
 			}
@@ -116,9 +128,7 @@ namespace Elastic.Apm.SqlClient
 					if (propertyFetcherSet.Exception.Fetch(payloadData) is Exception exception) span.CaptureException(exception);
 
 					if (propertyFetcherSet.ErrorCommand.Fetch(payloadData) is IDbCommand dbCommand)
-					{
 						_apmAgent.TracerInternal.DbSpanCommon.EndSpan(span, dbCommand);
-					}
 					else
 					{
 						_logger.Warning()?.Log("Cannot extract database command from {PayloadData}", payloadData);

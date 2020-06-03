@@ -1,4 +1,8 @@
-﻿using System;
+﻿// Licensed to Elasticsearch B.V under one or more agreements.
+// Elasticsearch B.V licenses this file to you under the Apache 2.0 License.
+// See the LICENSE file in the project root for more information
+
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -123,6 +127,8 @@ namespace Elastic.Apm.AspNetCore.Tests
 			Environment.SetEnvironmentVariable(ConfigConsts.EnvVarNames.Environment, environment);
 			var secretToken = "SecretToken";
 			Environment.SetEnvironmentVariable(ConfigConsts.EnvVarNames.SecretToken, secretToken);
+			var apiKey = "apiKey";
+			Environment.SetEnvironmentVariable(ConfigConsts.EnvVarNames.ApiKey, apiKey);
 			Environment.SetEnvironmentVariable(ConfigConsts.EnvVarNames.CaptureHeaders, false.ToString());
 			Environment.SetEnvironmentVariable(ConfigConsts.EnvVarNames.TransactionSampleRate, "0.123");
 			var configBuilder = new ConfigurationBuilder()
@@ -137,6 +143,7 @@ namespace Elastic.Apm.AspNetCore.Tests
 			config.ServiceVersion.Should().Be(serviceVersion);
 			config.Environment.Should().Be(environment);
 			config.SecretToken.Should().Be(secretToken);
+			config.ApiKey.Should().Be(apiKey);
 			config.CaptureHeaders.Should().Be(false);
 			config.TransactionSampleRate.Should().Be(0.123);
 		}

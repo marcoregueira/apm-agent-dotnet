@@ -1,3 +1,7 @@
+// Licensed to Elasticsearch B.V under one or more agreements.
+// Elasticsearch B.V licenses this file to you under the Apache 2.0 License.
+// See the LICENSE file in the project root for more information
+
 using System;
 using System.Collections.Generic;
 using Elastic.Apm.Config;
@@ -48,6 +52,7 @@ namespace Elastic.Apm.Tests
 			public int MaxQueueEventCount => ConfigConsts.DefaultValues.MaxQueueEventCount;
 			public double MetricsIntervalInMilliseconds => ConfigConsts.DefaultValues.MetricsIntervalInMilliseconds;
 			public string SecretToken { get; }
+			public string ApiKey { get; }
 			public IReadOnlyList<Uri> ServerUrls => new List<Uri> { ConfigConsts.DefaultValues.ServerUri };
 			public string ServiceName { get; }
 			public string ServiceVersion { get; }
@@ -57,6 +62,8 @@ namespace Elastic.Apm.Tests
 			public double TransactionSampleRate => ConfigConsts.DefaultValues.TransactionSampleRate;
 
 			public bool VerifyServerCert => ConfigConsts.DefaultValues.VerifyServerCert;
+			public IReadOnlyCollection<string> ExcludedNamespaces => ConfigConsts.DefaultValues.DefaultExcludedNamespaces;
+			public IReadOnlyCollection<string> ApplicationNamespaces => ConfigConsts.DefaultValues.DefaultApplicationNamespaces;
 
 			public bool UseElasticTraceparentHeader => ConfigConsts.DefaultValues.UseElasticTraceparentHeader;
 

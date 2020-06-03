@@ -1,5 +1,10 @@
-﻿using Elastic.Apm.DiagnosticSource;
+﻿// Licensed to Elasticsearch B.V under one or more agreements.
+// Elasticsearch B.V licenses this file to you under the Apache 2.0 License.
+// See the LICENSE file in the project root for more information
+
+using Elastic.Apm.DiagnosticSource;
 using Elastic.Apm.EntityFrameworkCore;
+using Elastic.Apm.SqlClient;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 
@@ -24,6 +29,7 @@ namespace Elastic.Apm.NetCoreAll
 			this IApplicationBuilder builder,
 			IConfiguration configuration = null
 		) => AspNetCore.ApmMiddlewareExtension
-			.UseElasticApm(builder, configuration, new HttpDiagnosticsSubscriber(), new EfCoreDiagnosticsSubscriber());
+			.UseElasticApm(builder, configuration, new HttpDiagnosticsSubscriber(), new EfCoreDiagnosticsSubscriber(),
+				new SqlClientDiagnosticSubscriber());
 	}
 }
