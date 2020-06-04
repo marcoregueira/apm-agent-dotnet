@@ -3,6 +3,7 @@
 // See the LICENSE file in the project root for more information
 
 using System.Web.Services;
+using Elastic.Apm;
 
 namespace AspNetFullFrameworkSampleApp.Asmx
 {
@@ -11,6 +12,14 @@ namespace AspNetFullFrameworkSampleApp.Asmx
 	public class Health : WebService
 	{
 		[WebMethod]
-		public string Ping() => "Ok";
+
+		public string Ping()
+		{
+			Agent.Tracer.CaptureTransaction(nameof(Ping), "ping", () =>
+			 {
+				 System.Threading.Thread.Sleep(1000);
+			 });
+			return "Ok";
+		}
 	}
 }
