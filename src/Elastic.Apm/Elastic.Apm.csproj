@@ -8,7 +8,7 @@
     <AssemblyName>Elastic.Apm</AssemblyName>
     <SignAssembly>false</SignAssembly>
     <PackageId>Ego.Apm.Agent</PackageId>
-    <Version>1.4.1-alpha</Version>
+    <Version>1.9.1-alpha</Version>
     <Description>Custom Elastic Apm Agent with minor changes
 Apache 2.0</Description>
     <Company />
@@ -18,9 +18,6 @@ Apache 2.0</Description>
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
     <PackageReference Include="System.Diagnostics.PerformanceCounter" Version="4.5.0" />
   </ItemGroup>
-  <PropertyGroup>
-    <PackageVersion>1.4.1-alpha</PackageVersion>
-  </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="4.6.0" />
     <PackageReference Include="Microsoft.Diagnostics.Tracing.TraceEvent" Version="2.0.2" />
