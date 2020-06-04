@@ -1,5 +1,4 @@
-﻿using Dapper;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Npgsql;
 using Windows.Metrics.Ingest.Ef;
 
