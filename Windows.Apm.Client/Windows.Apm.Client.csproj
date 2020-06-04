@@ -16,9 +16,13 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="NLog" Version="4.6.8" />
-    <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="4.6.0" />
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Web" />
+
     <ProjectReference Include="..\src\Elastic.Apm\Elastic.Apm.csproj" />
   </ItemGroup>
   <ItemGroup>
