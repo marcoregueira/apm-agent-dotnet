@@ -88,6 +88,8 @@ namespace Windows.Metrics.Ingest.Dto
 			public string Type { get; set; }                    //     "request"}
 			public string Result { get; set; }                    //     "request"}
 			public ContextDto Context { get; set; }
+			public string remotehost { get; set; }
+			public string database { get; set; }
 		}
 
 		public class ContextDto
@@ -114,6 +116,8 @@ namespace Windows.Metrics.Ingest.Dto
 			public string Parent_id { get; set; }              //              "76d01eaf4700f78dbf06c68b035f9f27",
 			public string Trace_id { get; set; }              //              "76d01eaf4700f78dbf06c68b035f9f27",
 			public string Type { get; set; }                    //     "request"}
+			public string remotehost { get; set; }
+			public string database { get; set; }
 		}
 	}
 }

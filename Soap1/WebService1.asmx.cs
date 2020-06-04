@@ -19,11 +19,11 @@ namespace Soap1
 	{
 
 		[WebMethod]
-		public ClRequest GetPendingOutputMessages(ClRequest req)
+		public ClRequest GetPendingOutputMessages(string param)
 		{
 			Logger.Instance.Debug("Called");
 			throw new InsufficientExecutionStackException("**************************************************************************************** ESTA ES UNA EXCEPCIÓN DE MENTIRA ********************************************************************************");
-			return req;
+			return new ClRequest();
 		}
 	}
 

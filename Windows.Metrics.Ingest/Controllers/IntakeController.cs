@@ -9,17 +9,23 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Windows.Metrics.Ingest.Data;
 using Windows.Metrics.Ingest.Dto;
+using Windows.Metrics.Ingest.Ef;
 
 namespace Windows.Metrics.Ingest.Controllers
 {
 	[ApiController]
 	public class IntakeController : Controller
 	{
+		private readonly BaseContext context;
 		private readonly ILogger<IntakeController> _logger;
 		private MetricCrud _crud { get; }
 
-		public IntakeController(ILogger<IntakeController> logger, MetricCrud crud)
+		public IntakeController(
+			BaseContext context,
+			ILogger<IntakeController> logger,
+			MetricCrud crud)
 		{
+			this.context = context;
 			_logger = logger;
 			_crud = crud;
 		}
@@ -183,7 +189,9 @@ namespace Windows.Metrics.Ingest.Controllers
 						TransactionId = transactionInfo.id,
 						Duration = Math.Round(transactionInfo.duration),
 						Result = transactionInfo.Result,
-						Name= transactionInfo.name,
+						Name = transactionInfo.name,
+						RemoteHost = transactionInfo.remotehost,
+						Database = transactionInfo.database,
 						ParentId = null,
 						Data = JsonConvert.SerializeObject(errorSet.Transaction)
 					};
@@ -208,6 +216,8 @@ namespace Windows.Metrics.Ingest.Controllers
 						TransactionId = spanInfo.Trace_id,
 						Duration = spanInfo.duration,
 						ParentId = spanInfo.Parent_id,
+						RemoteHost = spanInfo.remotehost,
+						Database = spanInfo.database,
 						Data = JsonConvert.SerializeObject(errorSet.Span)
 					};
 
@@ -220,6 +230,7 @@ namespace Windows.Metrics.Ingest.Controllers
 				}
 			}
 
+			await context.SaveChangesAsync();
 			return Ok();
 		}
 
@@ -270,7 +281,7 @@ namespace Windows.Metrics.Ingest.Controllers
 
 		public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
 		{
-			var t = (long) reader.Value;
+			var t = (long)reader.Value;
 			return BaseDate.AddMilliseconds(t / 1000);
 		}
 

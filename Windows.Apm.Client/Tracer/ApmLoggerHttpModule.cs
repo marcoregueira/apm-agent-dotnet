@@ -246,6 +246,7 @@ namespace WMS_Infrastructure.Instrumentation
 			}
 			catch (Exception ex)
 			{
+				Console.WriteLine("Processing BeginRequest event failed");
 				//_logger.Error()?.LogException(ex, "Processing BeginRequest event failed");
 			}
 		}

@@ -6,16 +6,22 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Windows.Metrics.Ingest.Data;
 using Windows.Metrics.Ingest.Dto;
+using Windows.Metrics.Ingest.Ef;
 
 namespace Windows.Metrics.Ingest.Controllers
 {
 	public class ConfigurationController : Controller
 	{
+		private readonly BaseContext context;
 		private readonly ILogger<ConfigurationController> _logger;
 		private ConfigCrud _crud { get; }
 
-		public ConfigurationController(ILogger<ConfigurationController> logger, ConfigCrud crud)
+		public ConfigurationController(
+			BaseContext context,
+			ILogger<ConfigurationController> logger,
+			ConfigCrud crud)
 		{
+			this.context = context;
 			_logger = logger;
 			_crud = crud;
 		}
@@ -24,6 +30,7 @@ namespace Windows.Metrics.Ingest.Controllers
 		public async Task<IActionResult> PostDocument([FromBody]ClientInfoRequest request)
 		{
 			var config = _crud.GetConfig(request);
+			await context.SaveChangesAsync();
 			return Ok(config);
 		}
 	}

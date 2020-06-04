@@ -10,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Windows.Metrics.Ingest.Data;
+using Windows.Metrics.Ingest.Ef;
 
 namespace Windows.Metrics.Ingest
 {
@@ -26,6 +27,8 @@ namespace Windows.Metrics.Ingest
 			services
 				.AddControllers()
 				.AddNewtonsoftJson();
+
+			services.AddDbContext<BaseContext, PostgresContext>();
 
 			services.AddScoped<ConfigCrud>();
 			services.AddScoped<MetricCrud>();

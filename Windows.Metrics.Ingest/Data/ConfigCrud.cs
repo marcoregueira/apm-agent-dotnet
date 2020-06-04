@@ -1,9 +1,7 @@
-﻿using System;
-using System.Linq;
-using Dapper;
+﻿using System.Linq;
 using Microsoft.Extensions.Configuration;
-using Npgsql;
 using Windows.Metrics.Ingest.Dto;
+using Windows.Metrics.Ingest.Ef;
 
 namespace Windows.Metrics.Ingest.Data
 {
@@ -12,68 +10,27 @@ namespace Windows.Metrics.Ingest.Data
 		public IConfiguration Configuration { get; }
 
 		private readonly string _connectionString;
+		private readonly BaseContext context;
 
-		public ConfigCrud(IConfiguration configuration)
+		public ConfigCrud(IConfiguration configuration, BaseContext context)
 		{
 			Configuration = configuration;
+			this.context = context;
 			_connectionString = Configuration.GetConnectionString("default");
 		}
 
-		internal ClientInfoResponse GetConfig(ClientInfoRequest request)
+		internal ClientConfig GetConfig(ClientInfoRequest request)
 		{
-			using (var connection = new NpgsqlConnection(_connectionString))
+			var config = context.Config
+				.Where(x => x.Client == request.Client && x.App == request.App)
+				.FirstOrDefault();
+
+			if (config == null)
 			{
-				connection.Open();
-				var config = connection.Query<ClientInfoResponse>(
-					@"SELECT * FROM client_config
-					  WHERE client= @client and app= @app and @app > ''", request)
-					.FirstOrDefault();
-
-				if (config == null)
-				{
-					config = new ClientInfoResponse() { Client = request.Client, App = request.App };
-					InsertConfig(config);
-				}
-				return config;
+				config = new ClientConfig() { Client = request.Client, App = request.App };
+				context.Add(config);
 			}
-		}
-
-		private void InsertConfig(ClientInfoResponse config)
-		{
-			/*
-
-				CREATE TABLE public.errors
-				(
-				  "time" timestamp without time zone,
-				  host text,
-				  app text,
-				  errorid text,
-				  transactionid text,
-				  data jsonb
-				)
-				WITH (
-				  OIDS=FALSE
-				);
-				ALTER TABLE public.errors
-				  OWNER TO postgres;
-
-			 */
-
-			using (var connection = new NpgsqlConnection(_connectionString))
-			{
-				connection.Open();
-				connection.Execute(@"
-					Insert into public.client_config
-					(client, app, logsqlenabled, metricsenabled, traceenabled, loglevel)
-					values
-					(	@Client,
-						@App,
-						@LogSqlEnabled,
-						@MetricsEnabled,
-						@TraceEnabled,
-						@LogLevel
-					)", config);
-			}
+			return config;
 		}
 	}
 }

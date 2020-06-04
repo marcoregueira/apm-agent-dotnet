@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using Microsoft.Extensions.Configuration;
 using Npgsql;
+using Windows.Metrics.Ingest.Ef;
 
 namespace Windows.Metrics.Ingest.Data
 {
@@ -9,150 +10,80 @@ namespace Windows.Metrics.Ingest.Data
 		public IConfiguration Configuration { get; }
 
 		private readonly string _connectionString;
+		private readonly BaseContext context;
 
-		public MetricCrud(IConfiguration configuration)
+		public MetricCrud(IConfiguration configuration, BaseContext context)
 		{
 			Configuration = configuration;
+			this.context = context;
 			_connectionString = Configuration.GetConnectionString("default");
 		}
 
 		public void Insert(MetricData data)
 		{
-			/*
-				-- Table: public.metrics
-				-- DROP TABLE public.metrics;
-				CREATE TABLE public.metrics
-				(
-				"timestamp" timestamp without time zone,
-				host text,
-				data jsonb
-				)
-				WITH (
-				OIDS=FALSE
-				);
-				ALTER TABLE public.metrics
-				OWNER TO postgres;
-			 */
-
-
-			using (var connection = new NpgsqlConnection(_connectionString))
+			var metric = new MetricEntity()
 			{
-				connection.Open();
-				connection.Execute("Insert into public.metrics (time, host, data) values (@time, @host, CAST(@metrics AS jsonb));", data);
-				//var value = connection.Query<string>("Select data ->> 'first_name' from Employee;");
-				//Console.WriteLine(value.First());
-			}
+				Data = data.Metrics,
+				Host = data.Host,
+				Time = data.Time
+			};
+
+			context.Add(metric);
 		}
 
 		public void Insert(TransactionData transaction)
 		{
-			/*
-					CREATE TABLE public.transaction
-					(
-					  "time" timestamp without time zone,
-					  host text,
-					  app text,
-					  type text,
-					  id text,
-					  transactionid text,
-					  parentid text,
-					  data jsonb
-					)
-					WITH (
-					  OIDS=FALSE
-					);
-
-			 */
-			using (var connection = new NpgsqlConnection(_connectionString))
+			var transactionEntity = new TransactionEntity()
 			{
-				connection.Open();
-				connection.Execute(@"
-						Insert into public.transaction (time, host, app, type, id, transactionid, parentid, duration, data, userid, result, name)
-						values (@time, @host, @app, @type, @id, @transactionid, @parentid, @duration, CAST(@data AS jsonb), @user, @result, @name);", transaction);
-				//var value = connection.Query<string>("Select data ->> 'first_name' from Employee;");
-				//Console.WriteLine(value.First());
-			}
+				Name = transaction.Name,
+				ParentId = transaction.ParentId,
+				Time = transaction.Time,
+				Duration = transaction.Duration,
+				Host = transaction.Host,
+				Database = transaction.Database,
+				RemoteHost = transaction.RemoteHost,
+				Result = transaction.Result,
+				TransactionId = transaction.TransactionId,
+				TransactionType = transaction.Type,
+				Id = transaction.Id,
+				Data = transaction.Data,
+				UserId = transaction.User
+			};
+			context.Add(transactionEntity);
 		}
 
 		public void Insert(ErrorData data)
 		{
-			/*
-
-				CREATE TABLE public.errors
-				(
-				  "time" timestamp without time zone,
-				  host text,
-				  app text,
-				  errorid text,
-				  transactionid text,
-				  data jsonb
-				)
-				WITH (
-				  OIDS=FALSE
-				);
-				ALTER TABLE public.errors
-				  OWNER TO postgres;
-
-			 */
-
-			using (var connection = new NpgsqlConnection(_connectionString))
+			var errorEntity = new ErrorEntity()
 			{
-				connection.Open();
-				connection.Execute(@"
-					Insert into public.errors
-					(time, host, data, transactionid, errorid, app)
-					values
-					(@time, @host, CAST(@errorInfo AS jsonb),  @transactionid, @errorid, @app);", data);
-				//var value = connection.Query<string>("Select data ->> 'first_name' from Employee;");
-				//Console.WriteLine(value.First());
-			}
+				App = data.App,
+				Host = data.Host,
+				Time = data.Time,
+				ErrorId = data.ErrorId,
+				Data = data.ErrorInfo
+			};
+
+			context.Add(errorEntity);
 		}
 
 		public void Insert(LogData data)
 		{
-			/*
-
-				CREATE TABLE public.errors
-				(
-				  "time" timestamp without time zone,
-				  host text,
-				  app text,
-				  errorid text,
-				  transactionid text,
-				  data jsonb
-				)
-				WITH (
-				  OIDS=FALSE
-				);
-				ALTER TABLE public.errors
-				  OWNER TO postgres;
-
-			 */
-
-			using (var connection = new NpgsqlConnection(_connectionString))
+			var logEntity = new LogEntity()
 			{
-				connection.Open();
-				connection.Execute(@"
-					Insert into public.log
-					(time, host, data, transactionid,
-					   database, remotehost, duration,
-					   logid, app, level, message, userid)
-					values
-					(	@time,
-						@host,
-						CAST(@logInfo AS jsonb),
-						@transactionid,
-						@database,
-						@remotehost,
-						@duration,
-						@logid,
-						@app,
-						@level,
-						@message,
-						@user);", data);
-				//var value = connection.Query<string>("Select data ->> 'first_name' from Employee;");
-				//Console.WriteLine(value.First());
-			}
+				Data = data.LogInfo,
+				Database = data.Database,
+				Duration = data.Duration ?? 0,
+				Host = data.Host,
+				Level = data.Level,
+				LogId = data.LogId,
+				Message = data.Message,
+				Time = data.Time,
+				RemoteHost = data.RemoteHost,
+				TransactionId = data.TransactionId,
+				UserId = data.TransactionId
+			};
+
+			context.Add(logEntity);
 		}
 	}
 }

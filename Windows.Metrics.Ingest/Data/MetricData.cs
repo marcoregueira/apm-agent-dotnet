@@ -50,7 +50,9 @@ namespace Windows.Metrics.Ingest.Data
 		public string ParentId { get; set; }
 		public string Result { get; set; }
 		public decimal Duration { get; set; }
-		public object Data { get; set; }
+		public string Data { get; set; }
 		public string Name { get; set; }
+		public string RemoteHost { get; set; }
+		public string Database { get; set; }
 	}
 }
