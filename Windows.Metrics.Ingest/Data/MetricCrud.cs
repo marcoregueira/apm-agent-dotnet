@@ -59,7 +59,8 @@ namespace Windows.Metrics.Ingest.Data
 				Host = data.Host,
 				Time = data.Time,
 				ErrorId = data.ErrorId,
-				Data = data.ErrorInfo
+				Data = data.ErrorInfo,
+				TransactionId=data.TransactionId
 			};
 
 			context.Add(errorEntity);

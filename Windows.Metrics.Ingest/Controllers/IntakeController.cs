@@ -182,16 +182,16 @@ namespace Windows.Metrics.Ingest.Controllers
 						Time = time,
 						Host = tags.ContainsKey("host") ? tags["host"] : metadata?.Metadata?.System.HostName,
 						User = tags.ContainsKey("user") ? tags["user"] : "(Vacío)",
+						Database = tags.ContainsKey("database") ? tags["database"] : "(Vacío)",
+						RemoteHost = tags.ContainsKey("remotehost") ? tags["remotehost"] : "(Vacío)",
 
 						App = metadata?.Metadata?.Service?.Name,
 						Type = transactionInfo.Type,
 						Id = transactionInfo.Trace_id,
 						TransactionId = transactionInfo.id,
 						Duration = Math.Round(transactionInfo.duration),
-						Result = transactionInfo.Result,
+						Result = string.IsNullOrWhiteSpace(transactionInfo.Result) ? "(Vacío)" : transactionInfo.Result,
 						Name = transactionInfo.name,
-						RemoteHost = transactionInfo.remotehost,
-						Database = transactionInfo.database,
 						ParentId = null,
 						Data = JsonConvert.SerializeObject(errorSet.Transaction)
 					};

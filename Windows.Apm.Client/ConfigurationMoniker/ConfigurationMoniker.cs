@@ -44,12 +44,19 @@ namespace Windows.Apm.Client
 				return transaction;
 			}
 
+			IError FilterError(IError transaction)
+			{
+				//GetClientInfo(transaction.Labels);
+				return transaction;
+			}
+
 
 			if (Agent.Instance.PayloadSender is LocalPayloadSenderV2)
 			{
 				var localSender = Agent.Instance.PayloadSender as LocalPayloadSenderV2;
 				localSender.TransactionFilters.Add(FilterTransaction);
 				localSender.SpanFilters.Add(FilterSpan);
+				localSender.ErrorFilters.Add(FilterError);
 			}
 			else
 			{
@@ -60,7 +67,7 @@ namespace Windows.Apm.Client
 
 		public static void EnableMoniker(IConfigurationReader reader, bool checkInmediate = false)
 		{
-	
+
 			Client = new HttpClient
 			{
 				BaseAddress = reader.ServerUrls.FirstOrDefault()
