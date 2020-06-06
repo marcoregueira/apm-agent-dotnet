@@ -116,6 +116,11 @@ namespace Windows.Metrics.Ingest.Dto
 			public string Type { get; set; }                    //     "request"}
 			public string remotehost { get; set; }
 			public string database { get; set; }
+			public ContextDto Context { get; set; }
+		}
+		public class ContextDto
+		{
+			public Dictionary<string, string> Tags { get; set; }
 		}
 	}
 }

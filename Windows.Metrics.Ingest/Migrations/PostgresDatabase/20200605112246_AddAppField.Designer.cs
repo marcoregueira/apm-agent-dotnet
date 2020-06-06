@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Windows.Metrics.Ingest.Ef;
@@ -9,9 +10,10 @@ using Windows.Metrics.Ingest.Ef;
 namespace Windows.Metrics.Ingest.Migrations.PostgresDatabase
 {
     [DbContext(typeof(PostgresContext))]
-    partial class PostgresDatabaseModelSnapshot : ModelSnapshot
+    [Migration("20200605112246_AddAppField")]
+    partial class AddAppField
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -184,10 +186,6 @@ namespace Windows.Metrics.Ingest.Migrations.PostgresDatabase
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SequenceHiLo);
-
-                    b.Property<string>("App")
-                        .HasColumnName("app")
-                        .HasColumnType("text");
 
                     b.Property<string>("Data")
                         .HasColumnName("data")

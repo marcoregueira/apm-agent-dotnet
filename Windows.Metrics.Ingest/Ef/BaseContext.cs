@@ -29,7 +29,7 @@ namespace Windows.Metrics.Ingest.Ef
 	{
 
 		/*
-		 dotnet ef migrations add InitialCreate --context PostgresContext --output-dir Migrations/PostgresDatabase
+		 dotnet ef migrations add AddAppField --context PostgresContext --output-dir Migrations/PostgresDatabase
 		 dotnet ef database update --context PostgresContext
 		*/
 

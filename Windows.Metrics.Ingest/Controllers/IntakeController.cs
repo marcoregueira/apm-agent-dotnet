@@ -186,15 +186,19 @@ namespace Windows.Metrics.Ingest.Controllers
 						RemoteHost = tags.ContainsKey("remotehost") ? tags["remotehost"] : "(Vacío)",
 
 						App = metadata?.Metadata?.Service?.Name,
-						Type = transactionInfo.Type,
+						Type = string.IsNullOrWhiteSpace(transactionInfo.Type) ? "(Vacío)" : transactionInfo.Type,
 						Id = transactionInfo.Trace_id,
 						TransactionId = transactionInfo.id,
 						Duration = Math.Round(transactionInfo.duration),
 						Result = string.IsNullOrWhiteSpace(transactionInfo.Result) ? "(Vacío)" : transactionInfo.Result,
-						Name = transactionInfo.name,
-						ParentId = null,
+						Name = string.IsNullOrWhiteSpace(transactionInfo.name) ? "(Vacío)" : transactionInfo.name,
+						ParentId = "",
 						Data = JsonConvert.SerializeObject(errorSet.Transaction)
 					};
+
+					dataDb.App = string.IsNullOrWhiteSpace(dataDb.App) ? "(Vacío)" : dataDb.App;
+					dataDb.User = string.IsNullOrWhiteSpace(dataDb.User) ? "(Vacío)" : dataDb.User;
+					dataDb.RemoteHost = string.IsNullOrWhiteSpace(dataDb.RemoteHost) ? "(Vacío)" : dataDb.RemoteHost;
 
 					_crud.Insert(dataDb);
 					continue;
@@ -206,20 +210,27 @@ namespace Windows.Metrics.Ingest.Controllers
 					var errorDetailsJson = errorSet.Span?.ToString();
 					var spanInfo = JsonConvert.DeserializeObject<SpanDto.TransactionDtoInternal>(errorDetailsJson, new ApmDateTimeConverter());
 					time = spanInfo.Timestamp;
+					var tags = spanInfo.Context?.Tags ?? new Dictionary<string, string>();
+
 					var dataDb = new TransactionData()
 					{
 						Time = time,
-						Host = metadata?.Metadata?.System.HostName,
+						Host = tags.ContainsKey("host") ? tags["host"] : metadata?.Metadata?.System.HostName,
+						User = tags.ContainsKey("user") ? tags["user"] : "(Vacío)",
+						Database = tags.ContainsKey("database") ? tags["database"] : "(Vacío)",
+						RemoteHost = tags.ContainsKey("remotehost") ? tags["remotehost"] : "(Vacío)",
 						App = metadata?.Metadata?.Service?.Name,
-						Type = spanInfo.Type,
+						Type = string.IsNullOrWhiteSpace(spanInfo.Type) ? "(Vacío)" : spanInfo.Type,
 						Id = spanInfo.Trace_id,
 						TransactionId = spanInfo.Trace_id,
-						Duration = spanInfo.duration,
+						Duration = Math.Round(spanInfo.duration),
 						ParentId = spanInfo.Parent_id,
-						RemoteHost = spanInfo.remotehost,
-						Database = spanInfo.database,
 						Data = JsonConvert.SerializeObject(errorSet.Span)
 					};
+
+					dataDb.App = string.IsNullOrWhiteSpace(dataDb.App) ? "(Vacío)" : dataDb.App;
+					dataDb.User= string.IsNullOrWhiteSpace(dataDb.User) ? "(Vacío)" : dataDb.User;
+					dataDb.RemoteHost= string.IsNullOrWhiteSpace(dataDb.RemoteHost) ? "(Vacío)" : dataDb.RemoteHost;
 
 					_crud.Insert(dataDb);
 					continue;

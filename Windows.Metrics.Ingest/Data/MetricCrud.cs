@@ -46,7 +46,8 @@ namespace Windows.Metrics.Ingest.Data
 				TransactionType = transaction.Type,
 				Id = transaction.Id,
 				Data = transaction.Data,
-				UserId = transaction.User
+				UserId = transaction.User,
+				App = transaction.App
 			};
 			context.Add(transactionEntity);
 		}
@@ -60,7 +61,7 @@ namespace Windows.Metrics.Ingest.Data
 				Time = data.Time,
 				ErrorId = data.ErrorId,
 				Data = data.ErrorInfo,
-				TransactionId=data.TransactionId
+				TransactionId = data.TransactionId
 			};
 
 			context.Add(errorEntity);
@@ -74,6 +75,7 @@ namespace Windows.Metrics.Ingest.Data
 				Database = data.Database,
 				Duration = data.Duration ?? 0,
 				Host = data.Host,
+				App = data.App,
 				Level = data.Level,
 				LogId = data.LogId,
 				Message = data.Message,

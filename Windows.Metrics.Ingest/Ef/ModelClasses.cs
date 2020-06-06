@@ -105,6 +105,8 @@ namespace Windows.Metrics.Ingest.Ef
 
 		[Column("data", TypeName = "jsonb")]
 		public string Data { get; set; }
+		[Column("app")]
+		public string App { get; internal set; }
 	}
 
 	[Table("transaction")]
@@ -115,6 +117,9 @@ namespace Windows.Metrics.Ingest.Ef
 
 		[Column("host")]
 		public string Host { get; set; }
+
+		[Column("app")]
+		public string App { get; set; }
 
 		[Column("name")]
 		public string Name { get; set; }
