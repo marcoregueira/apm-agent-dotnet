@@ -125,8 +125,8 @@ namespace Elastic.Apm.Report
 			if (eventObj is IError && !GlobalOverrides.TraceEnabled)
 				return false;
 
-			// if (eventObj is LogEntry && !GlobalOverrides.TraceEnabled)
-			// 	return false;
+			if (eventObj is LogEntry && !GlobalOverrides.TraceEnabled)
+				return false;
 
 			if (eventObj is LogEntry && (!IsAcceptedLevel(eventObj as LogEntry)))
 				return false;
@@ -258,10 +258,13 @@ namespace Elastic.Apm.Report
 
 		private async Task ProcessQueueItems(object[] queueItems)
 		{
-			if (!GlobalOverrides.AnyEnabled)
-			{
-				return;
-			}
+
+			// Siempre procesamos la cola pendiente,
+			// desactivar las trazas impide que entren nuevas, pero no elimina las viejas
+			//    if (!GlobalOverrides.AnyEnabled)
+			//    {
+			//    	return;
+			//    }
 
 			try
 			{
@@ -276,24 +279,20 @@ namespace Elastic.Apm.Report
 					switch (item)
 					{
 						case Transaction transaction:
-							if (GlobalOverrides.TraceEnabled)
-								if (TryExecuteFilter(TransactionFilters, transaction) != null) SerializeAndSend(item, "transaction");
+							if (TryExecuteFilter(TransactionFilters, transaction) != null) SerializeAndSend(item, "transaction");
 							break;
 						case Span span:
-							if (GlobalOverrides.TraceEnabled)
-								if (TryExecuteFilter(SpanFilters, span) != null) SerializeAndSend(item, "span");
+							if (TryExecuteFilter(SpanFilters, span) != null) SerializeAndSend(item, "span");
 							break;
 						case Error error:
-							if (GlobalOverrides.TraceEnabled)
-								if (TryExecuteFilter(ErrorFilters, error) != null) SerializeAndSend(item, "error");
+							if (TryExecuteFilter(ErrorFilters, error) != null) SerializeAndSend(item, "error");
 							break;
 						case MetricSet _:
-							if (GlobalOverrides.MetricsEnabled && !GlobalOverrides.ForceDisableMetrics)
+							if (!GlobalOverrides.ForceDisableMetrics)
 								SerializeAndSend(item, "metricset");
 							break;
 						case LogEntry _:
-							if (GlobalOverrides.TraceEnabled)
-								SerializeAndSend(item, "log");
+							SerializeAndSend(item, "log");
 							break;
 					}
 					_logger?.Trace()?.Log("Serialized item to send: {ItemToSend} as {SerializedItem}", item, serialized);
