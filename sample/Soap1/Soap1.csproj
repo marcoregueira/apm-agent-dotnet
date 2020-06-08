@@ -76,6 +76,11 @@
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Services" />
   </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="NLog">
+      <Version>4.6.8</Version>
+    </PackageReference>
+  </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
