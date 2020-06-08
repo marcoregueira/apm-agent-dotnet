@@ -9,10 +9,12 @@
       This is a ElasticSearch Apm Client with some minor changes and customizations compiled for net61
       License Apache 2.0
     </Description>
-    <SignAssembly>false</SignAssembly>
+    <SignAssembly>true</SignAssembly>
     <Version>1.0.0-alpha</Version>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <AssemblyOriginatorKeyFile>elasticapm.snk</AssemblyOriginatorKeyFile>
+    <DelaySign>false</DelaySign>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="NLog" Version="4.6.8" />
@@ -22,10 +24,10 @@
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Web" />
-
-    <ProjectReference Include="..\src\Elastic.Apm\Elastic.Apm.csproj" />
+    <ProjectReference Include="..\Elastic.Apm\Elastic.Apm.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <Reference Include="System.Web" />
+    <ItemGroup>
+    <PackageReference Condition=" '$(OS)' != 'Windows_NT' " Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0" PrivateAssets="All" />
   </ItemGroup>
+  
 </Project>

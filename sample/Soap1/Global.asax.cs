@@ -4,7 +4,6 @@ using System.Linq;
 using System.Web;
 using System.Web.Security;
 using System.Web.SessionState;
-using Libertis.WMS_WS.Code;
 using NLog.Targets;
 using ProcessMonitoring;
 using Windows.Apm.Client;
@@ -22,6 +21,7 @@ namespace Soap1
 		{
 			base.Init();
 			var module = new ApmLoggerHttpModule();
+			module.Init(this);
 
 			if (_onlyOnce)
 				lock (locker)
@@ -31,7 +31,6 @@ namespace Soap1
 
 					_onlyOnce = false;
 				}
-			module.Init(this);
 		}
 
 		private static bool _onlyOnce = true;
@@ -39,7 +38,7 @@ namespace Soap1
 
 		private void ConfigureNLogAndApm(ApmLoggerHttpModule module)
 		{
-			SoapExceptionHandler.RegisterSoapExtension(); //no tiene nada que ver con apm, es para sacar las expciones de Soap y logarlas.
+			//SoapExceptionHandler.RegisterSoapExtension(); //no tiene nada que ver con apm, es para sacar las expciones de Soap y logarlas.
 
 			//Configurar NLOG
 			//if (LogFile.ApmEnabled)

@@ -7,6 +7,8 @@
     <Description>Elastic APM for ASP.NET Full Framework. This package contains auto instrumentation for ASP.NET Full Framework. See: https://github.com/elastic/apm-agent-dotnet/tree/master/docs</Description>
     <PackageTags>apm, monitoring, elastic, elasticapm, analytics, aspnet</PackageTags>
     <Configurations>Debug;Release;NuGet</Configurations>
+    <SignAssembly>true</SignAssembly>
+    <DelaySign>false</DelaySign>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />

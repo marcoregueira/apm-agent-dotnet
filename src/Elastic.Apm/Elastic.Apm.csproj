@@ -6,7 +6,7 @@
   <PropertyGroup>
     <RootNamespace>Elastic.Apm</RootNamespace>
     <AssemblyName>Elastic.Apm</AssemblyName>
-    <SignAssembly>false</SignAssembly>
+    <SignAssembly>true</SignAssembly>
     <PackageId>Ego.Apm.Agent</PackageId>
     <Version>1.9.1-alpha</Version>
     <Description>Custom Elastic Apm Agent with minor changes
@@ -14,6 +14,7 @@ Apache 2.0</Description>
     <Company />
     <Authors>Marco Regueira</Authors>
     <Product>Ego.Apm.Agent</Product>
+    <DelaySign>false</DelaySign>
   </PropertyGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
     <PackageReference Include="System.Diagnostics.PerformanceCounter" Version="4.5.0" />

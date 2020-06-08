@@ -15,6 +15,9 @@ namespace AspNetFullFrameworkSampleApp.Asmx
 
 		public string Ping()
 		{
+
+			var transaction = Agent.Tracer.StartTransaction("ddd", "mine");
+
 			Agent.Tracer.CaptureTransaction(nameof(Ping), "ping", () =>
 			 {
 				 System.Threading.Thread.Sleep(1000);
