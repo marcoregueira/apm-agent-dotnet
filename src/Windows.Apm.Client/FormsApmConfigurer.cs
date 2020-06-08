@@ -16,15 +16,15 @@ using NLog;
 using NLog.Layouts;
 using NLog.Targets;
 using Windows.Apm.Client.Metrics;
+using Windows.Apm.Client.Nlog;
 
 namespace Windows.Apm.Client
 {
 	public class FormsApmConfigurer
 	{
 
-		public static void UseApm(string diskDrive = null, bool enableMoniker = false)
+		public static void UseApm(string diskDrive = null, bool enableMoniker = false, bool skipNLogTarget = false)
 		{
-
 			var configurationReader = new LocalConfigurationReader();
 
 			if (enableMoniker)
@@ -53,6 +53,9 @@ namespace Windows.Apm.Client
 				centralConfigFetcher: new LocalConfigFetcher());
 
 			Agent.Setup(components);
+
+			if (!skipNLogTarget)
+				Target.Register<NLogApmTarget>("apm");
 		}
 
 		public static IFinishedMonitor GetCompletedMonitor()
@@ -80,8 +83,8 @@ namespace Windows.Apm.Client
 
 			if (canSave)
 			{
-				var target = (FileTarget) LogManager.Configuration.FindTargetByName("file");
-				var currentTarget = ((SimpleLayout) target.FileName).OriginalText.Split('/').Last();
+				var target = (FileTarget)LogManager.Configuration.FindTargetByName("file");
+				var currentTarget = ((SimpleLayout)target.FileName).OriginalText.Split('/').Last();
 				target.FileName = Path.Combine(path, currentTarget);
 				LogManager.ReconfigExistingLoggers();
 			}
