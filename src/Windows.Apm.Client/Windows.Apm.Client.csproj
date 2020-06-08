@@ -10,10 +10,6 @@
       License Apache 2.0
     </Description>
     <SignAssembly>true</SignAssembly>
-    <Version>1.0.0-alpha</Version>
-    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-    <AssemblyOriginatorKeyFile>elasticapm.snk</AssemblyOriginatorKeyFile>
     <DelaySign>false</DelaySign>
   </PropertyGroup>
   <ItemGroup>
