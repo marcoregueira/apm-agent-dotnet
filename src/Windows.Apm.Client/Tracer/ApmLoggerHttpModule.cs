@@ -278,7 +278,8 @@ namespace WMS_Infrastructure.Instrumentation
 			SetCurrentTransaction(null);
 		}
 
-		private Dictionary<string, object> CustomValues { get; set; }
+		private Dictionary<string, object> CustomValues { get; set; } = new Dictionary<string, object>();
+
 		public void AddCustomData(string key, object value)
 		{
 			var transaction = GetCurrentTransaction();
