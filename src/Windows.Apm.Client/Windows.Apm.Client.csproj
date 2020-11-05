@@ -12,9 +12,9 @@
     <SignAssembly>true</SignAssembly>
     <DelaySign>false</DelaySign>
     <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
-    <AssemblyVersion>1.9.6</AssemblyVersion>
-    <FileVersion>1.9.6</FileVersion>
-    <Version>1.9.6</Version>
+    <AssemblyVersion>1.9.6.0</AssemblyVersion>
+    <FileVersion>1.9.6.0</FileVersion>
+    <Version>1.9.6.0</Version>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='NuGet|net461|AnyCPU'">
     <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
