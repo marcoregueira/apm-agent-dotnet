@@ -8,7 +8,7 @@
     <AssemblyName>Elastic.Apm</AssemblyName>
     <SignAssembly>true</SignAssembly>
     <PackageId>Ego.Apm.Agent</PackageId>
-    <Version>1.9.1-alpha</Version>
+    <Version>1.9.6-alpha</Version>
     <Description>Custom Elastic Apm Agent with minor changes
 Apache 2.0</Description>
     <Company />
@@ -16,6 +16,8 @@ Apache 2.0</Description>
     <Product>Ego.Apm.Agent</Product>
     <DelaySign>false</DelaySign>
     <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
+    <AssemblyVersion>1.9.6</AssemblyVersion>
+    <FileVersion>1.9.6</FileVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='NuGet|netstandard2.0|AnyCPU'">
     <Optimize>false</Optimize>
