@@ -1,19 +1,16 @@
-﻿using Elastic.Apm;
-using Elastic.Apm.Api;
-using Elastic.Apm.AspNetFullFramework;
-using Elastic.Apm.AspNetFullFramework.Extensions;
-using Elastic.Apm.Helpers;
-using Elastic.Apm.Model;
-using Elastic.Apm.Report;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Diagnostics;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Threading;
 using System.Web;
+using Elastic.Apm;
+using Elastic.Apm.Api;
+using Elastic.Apm.AspNetFullFramework.Extensions;
+using Elastic.Apm.Helpers;
+using Elastic.Apm.Model;
+using Elastic.Apm.Report;
 using Windows.Apm.Client.Nlog;
 
 namespace WMS_Infrastructure.Instrumentation
@@ -244,7 +241,7 @@ namespace WMS_Infrastructure.Instrumentation
 			{
 				ProcessBeginRequest(eventSender);
 			}
-			catch (Exception ex)
+			catch (Exception)
 			{
 				Console.WriteLine("Processing BeginRequest event failed");
 				//_logger.Error()?.LogException(ex, "Processing BeginRequest event failed");

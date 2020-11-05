@@ -1,9 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Globalization;
 using System.IO;
-using System.Linq;
 using System.Runtime.InteropServices;
 using Elastic.Apm.Api;
 using Elastic.Apm.Logging;
@@ -92,7 +90,7 @@ namespace Windows.Apm.Client.Metrics
 				var valQueue = _queueLengthPerformanceCounter.NextValue();
 				var valSpace = _diskFreeSpaceCounter.NextValue();
 				return new List<MetricSample> {
-					new MetricSample(DiskQueueTotalLength, (double)valQueue),
+					new MetricSample(DiskQueueTotalLength, valQueue),
 					new MetricSample(DiskSpace, 100 - (double)valSpace),
 					new MetricSample(DiskDrive, driveNumber ),
 				};

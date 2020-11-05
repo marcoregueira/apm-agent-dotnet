@@ -14,7 +14,6 @@ using Elastic.Apm.DiagnosticSource;
 using Elastic.Apm.Helpers;
 using Elastic.Apm.Logging;
 using Elastic.Apm.Model;
-using Windows.Apm.Client;
 
 namespace Elastic.Apm.AspNetFullFramework
 {

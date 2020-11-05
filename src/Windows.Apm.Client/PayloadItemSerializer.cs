@@ -1,6 +1,5 @@
 using Elastic.Apm.Config;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 
 namespace Elastic.Apm.Report.Serialization
 {

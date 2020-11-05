@@ -1,5 +1,5 @@
-﻿using Elastic.Apm.Api;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using Elastic.Apm.Api;
 
 namespace WMS_Infrastructure.Instrumentation
 {

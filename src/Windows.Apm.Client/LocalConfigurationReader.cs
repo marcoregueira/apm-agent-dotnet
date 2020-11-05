@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using Elastic.Apm.Helpers;
-using Elastic.Apm.Config;
 using Elastic.Apm.Logging;
 
 namespace Elastic.Apm.Config

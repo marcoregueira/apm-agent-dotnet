@@ -134,7 +134,7 @@ namespace Windows.Apm.Client
 						// Logger.Instance.Debug("Error recuperando la configuración de traza remota.");
 					}
 				}
-				catch (Exception ex)
+				catch (Exception)
 				{
 					// Logger.Instance.Debug("Error recuperando la configuración de traza remota.", ex);
 				}
@@ -143,7 +143,7 @@ namespace Windows.Apm.Client
 					_locker.Release();
 				}
 			}
-			catch (Exception ex)
+			catch (Exception)
 			{
 				Console.WriteLine("Moniker not working");
 			}

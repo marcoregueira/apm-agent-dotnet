@@ -1,8 +1,8 @@
 ﻿using System;
 using Elastic.Apm.Logging;
 using NLog;
-using NLogLevel = NLog.LogLevel;
 using ApmLogLevel = Elastic.Apm.Logging.LogLevel;
+using NLogLevel = NLog.LogLevel;
 
 namespace AspNetFullFrameworkSampleApp
 {

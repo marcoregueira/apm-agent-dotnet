@@ -1,8 +1,4 @@
-﻿using Elastic.Apm;
-using Elastic.Apm.Api;
-using Elastic.Apm.Helpers;
-using Elastic.Apm.Report;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
@@ -10,6 +6,10 @@ using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using Elastic.Apm;
+using Elastic.Apm.Api;
+using Elastic.Apm.Helpers;
+using Elastic.Apm.Report;
 using Windows.Apm.Client.Nlog;
 
 namespace WMS_Infrastructure.Instrumentation

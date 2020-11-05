@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Elastic.Apm;
 using Elastic.Apm.Api;
 using Elastic.Apm.AspNetFullFramework;
