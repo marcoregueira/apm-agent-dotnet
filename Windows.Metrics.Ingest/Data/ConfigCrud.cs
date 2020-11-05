@@ -19,7 +19,7 @@ namespace Windows.Metrics.Ingest.Data
 			_connectionString = Configuration.GetConnectionString("default");
 		}
 
-		internal ClientConfig GetConfig(ClientInfoRequest request)
+		internal ClientInfoResponse GetConfig(ClientInfoRequest request)
 		{
 			var config = context.Config
 				.Where(x => x.Client == request.Client && x.App == request.App)
@@ -30,7 +30,18 @@ namespace Windows.Metrics.Ingest.Data
 				config = new ClientConfig() { Client = request.Client, App = request.App };
 				context.Add(config);
 			}
-			return config;
+
+			var response = new ClientInfoResponse()
+			{
+				App = config.App,
+				Client = config.Client,
+				MetricsEnabled = config.MetricsEnabled,
+				LogSqlEnabled = config.LogSqlEnabled,
+				LogLevel = config.LogLevel,
+				TraceEnabled = config.TraceEnabled
+			};
+
+			return response;
 		}
 	}
 }

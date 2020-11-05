@@ -33,6 +33,9 @@ namespace Windows.Metrics.Ingest.Ef
 
 		[Column("loglevel")]
 		public string LogLevel { get; set; } = "Debug";
+
+		[Column("logsqlminduration_ms")]
+		public int MinSqlDuration { get; set; } = 250;
 	}
 
 	[Table("errors")]
@@ -105,6 +108,10 @@ namespace Windows.Metrics.Ingest.Ef
 
 		[Column("data", TypeName = "jsonb")]
 		public string Data { get; set; }
+
+		[Column("parentid")]
+		public string ParentId { get; internal set; }
+
 		[Column("app")]
 		public string App { get; internal set; }
 	}

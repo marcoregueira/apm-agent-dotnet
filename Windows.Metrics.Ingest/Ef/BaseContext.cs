@@ -27,7 +27,6 @@ namespace Windows.Metrics.Ingest.Ef
 
 	public class PostgresContext : BaseContext
 	{
-
 		/*
 		 dotnet ef migrations add AddAppField --context PostgresContext --output-dir Migrations/PostgresDatabase
 		 dotnet ef database update --context PostgresContext

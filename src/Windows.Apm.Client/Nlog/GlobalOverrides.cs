@@ -5,6 +5,7 @@
 		public static string LogLevel { get; set; } = null;
 		public static bool TraceEnabled { get; set; } = true;
 		public static bool LogSqlEnable { get; set; } = false;
+		public static int MinSqlDuration { get; set; } = 250;
 		public static bool MetricsEnabled { get; set; } = true;
 		public static bool ForceDisableMetrics { get; set; } = false;
 

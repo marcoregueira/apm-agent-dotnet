@@ -12,7 +12,7 @@ using Windows.Apm.Client.Nlog;
 
 namespace WindowsFormsClient
 {
-	static class Program
+	public static class Program
 	{
 		/// <summary>
 		/// The main entry point for the application.

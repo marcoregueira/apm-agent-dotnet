@@ -4,6 +4,7 @@
 	{
 		public bool LogSqlEnabled { get; set; }
 		public bool MetricsEnabled { get; set; }
+		public int MinSqlDuration { get; set; }
 		public bool TraceEnabled { get; set; }
 		public string LogLevel { get; set; } = "Debug";
 	}

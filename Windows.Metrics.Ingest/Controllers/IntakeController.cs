@@ -133,8 +133,8 @@ namespace Windows.Metrics.Ingest.Controllers
 						if (errorInfo.LogInfo.ContainsKey("host") && errorInfo.LogInfo["host"] != null)
 							dataDb.Host = errorInfo.LogInfo["host"];
 
-						if (errorInfo.LogInfo.ContainsKey("user") && errorInfo.LogInfo["user"] != null)
-							dataDb.User = errorInfo.LogInfo["user"];
+						if (errorInfo.LogInfo.ContainsKey("userid") && errorInfo.LogInfo["userid"] != null)
+							dataDb.User = errorInfo.LogInfo["userid"];
 
 						if (errorInfo.LogInfo.ContainsKey("remotehost") && errorInfo.LogInfo["remotehost"] != null)
 							dataDb.RemoteHost = errorInfo.LogInfo["remotehost"];

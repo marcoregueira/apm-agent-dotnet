@@ -27,6 +27,7 @@
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -98,6 +99,7 @@
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
     </Compile>
     <None Include="NLog.config" />
     <None Include="Properties\Settings.settings">
@@ -118,8 +120,8 @@
       <Project>{90bc9629-c8d2-4fd5-863e-ea2d5fb37341}</Project>
       <Name>Elastic.Apm</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Windows.Apm.Client\Windows.Apm.Client.csproj">
-      <Project>{15d42b66-2603-4dfa-ab13-e95371904ddc}</Project>
+    <ProjectReference Include="..\..\src\Windows.Apm.Client\Windows.Apm.Client.csproj">
+      <Project>{73a29351-046c-493f-8b30-c038269d6203}</Project>
       <Name>Windows.Apm.Client</Name>
     </ProjectReference>
   </ItemGroup>

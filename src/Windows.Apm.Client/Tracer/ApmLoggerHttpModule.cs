@@ -254,7 +254,7 @@ namespace WMS_Infrastructure.Instrumentation
 		private void ProcessBeginRequest(object eventSender)
 		{
 			CustomValues = new Dictionary<string, object>();
-			var httpApp = (HttpApplication) eventSender;
+			var httpApp = (HttpApplication)eventSender;
 			var httpRequest = httpApp.Context.Request;
 
 			var transactionName = $"{httpRequest.HttpMethod} {httpRequest.Path}";
@@ -295,7 +295,7 @@ namespace WMS_Infrastructure.Instrumentation
 
 		private void ProcessEndRequest(object eventSender)
 		{
-			var httpApp = (HttpApplication) eventSender;
+			var httpApp = (HttpApplication)eventSender;
 			var httpCtx = httpApp.Context;
 			var httpResponse = httpCtx.Response;
 
@@ -315,7 +315,6 @@ namespace WMS_Infrastructure.Instrumentation
 			}
 
 			_currentTransaction.End();
-			_currentTransaction = null;
 		}
 
 		private void SendErrorEventIfPresent(HttpContext httpCtx)
@@ -344,6 +343,5 @@ namespace WMS_Infrastructure.Instrumentation
 
 			//_logger.Debug()?.Log("Captured user - {CapturedUser}", transaction.Context.User);
 		}
-
 	}
 }

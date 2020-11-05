@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using System;
+using Microsoft.Extensions.Configuration;
 using Npgsql;
 using Windows.Metrics.Ingest.Ef;
 
@@ -77,12 +78,13 @@ namespace Windows.Metrics.Ingest.Data
 				Host = data.Host,
 				App = data.App,
 				Level = data.Level,
-				LogId = data.LogId,
+				LogId = string.IsNullOrWhiteSpace(data.LogId) ? Guid.NewGuid().ToString().Replace("-", "") : data.TransactionId,
 				Message = data.Message,
 				Time = data.Time,
-				RemoteHost = data.RemoteHost,
-				TransactionId = data.TransactionId,
-				UserId = data.TransactionId
+				RemoteHost = string.IsNullOrWhiteSpace(data.RemoteHost) ? "(Vacío)" : data.RemoteHost,
+				TransactionId = string.IsNullOrWhiteSpace(data.TransactionId) ? "(Vacío)" : data.TransactionId,
+				UserId = data.User,
+				ParentId = string.IsNullOrWhiteSpace(data.ParentId) ? "(Vacío)" : data.ParentId,
 			};
 
 			context.Add(logEntity);

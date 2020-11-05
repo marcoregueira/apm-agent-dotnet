@@ -68,8 +68,10 @@ namespace Elastic.Apm.AspNetFullFramework.Extensions
 
 			try
 			{
-				var xmlReader = new XmlTextReader(request.InputStream);
-				xmlReader.WhitespaceHandling = WhitespaceHandling.None;
+				var xmlReader = new XmlTextReader(request.InputStream)
+				{
+					WhitespaceHandling = WhitespaceHandling.None
+				};
 				xmlReader.Read();
 				xmlReader.ReadStartElement(); // if (xmlReader.LocalName != "Body") return null;
 				xmlReader.ReadStartElement();

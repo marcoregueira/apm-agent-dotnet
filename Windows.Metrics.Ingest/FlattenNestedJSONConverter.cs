@@ -54,9 +54,9 @@ namespace Windows.Metrics.Ingest
 					else
 					{
 						//store the current value
-						if (token is JValue)
+						if (token is JValue value)
 						{
-							propValue = ((JValue)token).Value;
+							propValue = value.Value;
 						}
 					}
 				}

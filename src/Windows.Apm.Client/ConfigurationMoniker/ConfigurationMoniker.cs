@@ -124,6 +124,7 @@ namespace Windows.Apm.Client
 							return;
 
 						GlobalOverrides.LogSqlEnable = config.LogSqlEnabled;
+						GlobalOverrides.MinSqlDuration = config.MinSqlDuration;
 						GlobalOverrides.TraceEnabled = config.TraceEnabled;
 						GlobalOverrides.MetricsEnabled = config.MetricsEnabled;
 						GlobalOverrides.LogLevel = config.LogLevel;
