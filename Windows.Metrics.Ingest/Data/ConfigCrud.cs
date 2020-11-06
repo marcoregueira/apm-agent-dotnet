@@ -38,7 +38,8 @@ namespace Windows.Metrics.Ingest.Data
 				MetricsEnabled = config.MetricsEnabled,
 				LogSqlEnabled = config.LogSqlEnabled,
 				LogLevel = config.LogLevel,
-				TraceEnabled = config.TraceEnabled
+				TraceEnabled = config.TraceEnabled,
+				MinSqlDuration= config.MinSqlDuration
 			};
 
 			return response;
