@@ -67,6 +67,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\src\Elastic.Apm\Elastic.Apm.csproj">
+      <Project>{90BC9629-C8D2-4FD5-863E-EA2D5FB37341}</Project>
+      <Name>Elastic.Apm</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\src\Windows.Apm.Client\Windows.Apm.Client.csproj">
       <Project>{73A29351-046C-493F-8B30-C038269D6203}</Project>
       <Name>Windows.Apm.Client</Name>
