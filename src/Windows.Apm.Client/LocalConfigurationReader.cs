@@ -6,8 +6,10 @@ using Elastic.Apm.Logging;
 
 namespace Elastic.Apm.Config
 {
-	internal class LocalConfigurationReader : AbstractConfigurationReader, IConfigurationReader
+	public class LocalConfigurationReader : AbstractConfigurationReader, IConfigurationReader
 	{
+		public static Dictionary<string, string> ConfigurationDataOverrides { get; set; } = new Dictionary<string, string>();
+
 		internal const string Origin = ".config file";
 		private const string ThisClassName = nameof(LocalConfigurationReader);
 
@@ -74,7 +76,14 @@ namespace Elastic.Apm.Config
 
 		public virtual bool VerifyServerCert => ParseVerifyServerCert(Read(ConfigConsts.KeyNames.VerifyServerCert));
 
-		private ConfigurationKeyValue Read(string key) => new ConfigurationKeyValue(key, ConfigurationManager.AppSettings[key]?.Trim(), Origin);
+		private ConfigurationKeyValue Read(string key)
+		{
+			if (ConfigurationDataOverrides.ContainsKey(key))
+			{
+				return new ConfigurationKeyValue(key, ConfigurationDataOverrides[key]?.Trim(), Origin);
+			}
+			return new ConfigurationKeyValue(key, ConfigurationManager.AppSettings[key]?.Trim(), Origin);
+		}
 
 		public IReadOnlyCollection<string> ExcludedNamespaces => ParseExcludedNamespaces(Read(ConfigConsts.EnvVarNames.ExcludedNamespaces));
 		public string ApiKey => ParseApiKey(Read(ConfigConsts.EnvVarNames.ApiKey));
