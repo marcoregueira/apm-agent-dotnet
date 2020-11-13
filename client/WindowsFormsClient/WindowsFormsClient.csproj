@@ -141,9 +141,6 @@
     <PackageReference Include="NLog">
       <Version>4.6.8</Version>
     </PackageReference>
-    <PackageReference Include="System.Memory">
-      <Version>4.5.4</Version>
-    </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
