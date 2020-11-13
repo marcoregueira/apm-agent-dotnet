@@ -2,11 +2,11 @@
   <!-- Src Directory Build Properties -->
   <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
   <PropertyGroup>
-    <AssemblyVersion>1.9.7</AssemblyVersion>
-    <InformationalVersion>1.9.7</InformationalVersion>
-    <FileVersion>1.9.7</FileVersion>
+    <AssemblyVersion>1.9.8</AssemblyVersion>
+    <InformationalVersion>1.9.8</InformationalVersion>
+    <FileVersion>1.9.8</FileVersion>
 
-    <PackageVersion>1.9.7</PackageVersion>
+    <PackageVersion>1.9.8</PackageVersion>
     <Authors>Elastic and contributors</Authors>
     <Copyright>2020 Elasticsearch BV</Copyright>
     <PackageLicenseUrl>https://github.com/elastic/apm-agent-dotnet/blob/master/LICENSE</PackageLicenseUrl>
