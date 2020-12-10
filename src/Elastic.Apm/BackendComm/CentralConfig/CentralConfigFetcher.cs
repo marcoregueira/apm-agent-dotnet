@@ -122,7 +122,7 @@ namespace Elastic.Apm.BackendComm.CentralConfig
 						+ " while fetching configuration from APM Server and parsing it.");
 				}
 
-				if (severity == LogLevel.Error) waitingLogSeverity = LogLevel.Information;
+				if (severity == LogLevel.Error) waitingLogSeverity = LogLevel.Trace;
 
 				_logger.IfLevel(severity)
 					?.LogException(ex, "Exception was thrown while fetching configuration from APM Server and parsing it."
