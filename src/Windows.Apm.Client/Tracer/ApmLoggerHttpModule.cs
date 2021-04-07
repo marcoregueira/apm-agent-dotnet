@@ -194,7 +194,7 @@ namespace WMS_Infrastructure.Instrumentation
 			if (!IsEnabled)
 				return;
 			var culprit = appName ?? ApplicationName;
-			var now = TimeUtils.ToTimestamp(customDate) ?? TimeUtils.TimestampNow();
+			var now = TimeUtils2.ToTimestamp(customDate) ?? TimeUtils.TimestampNow();
 			var errorLog = new LogEntry(
 				culprit: culprit,
 				id: null,

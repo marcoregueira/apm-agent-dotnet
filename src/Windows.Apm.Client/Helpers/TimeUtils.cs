@@ -2,7 +2,7 @@ using System;
 
 namespace Elastic.Apm.Helpers
 {
-	public static class TimeUtils
+	public static class TimeUtils2
 	{
 		/// <summary>
 		/// DateTime.UnixEpoch Field does not exist in .NET Standard 2.0

@@ -15,6 +15,7 @@
     <AssemblyVersion>1.9.6.0</AssemblyVersion>
     <FileVersion>1.9.6.0</FileVersion>
     <Version>1.9.6.0</Version>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='NuGet|net461|AnyCPU'">
     <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
@@ -22,9 +23,6 @@
     <DebugType>full</DebugType>
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
-  <ItemGroup>
-    <PackageReference Include="NLog" Version="4.6.8" />
-  </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
@@ -34,6 +32,7 @@
   </ItemGroup>
     <ItemGroup>
     <PackageReference Condition=" '$(OS)' != 'Windows_NT' " Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0" PrivateAssets="All" />
+    <PackageReference Include="NLog" Version="4.6.8" />
   </ItemGroup>
   
 </Project>

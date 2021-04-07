@@ -38,7 +38,7 @@ namespace Elastic.Apm.Report
 		private readonly int _maxQueueEventCount;
 		private readonly Metadata _metadata;
 
-		private readonly PayloadItemSerializer _payloadItemSerializer;
+		private readonly PayloadItemSerializer2 _payloadItemSerializer;
 
 		internal readonly List<Func<ITransaction, ITransaction>> TransactionFilters = new List<Func<ITransaction, ITransaction>>();
 		internal readonly List<Func<ISpan, ISpan>> SpanFilters = new List<Func<ISpan, ISpan>>();
@@ -51,7 +51,7 @@ namespace Elastic.Apm.Report
 			: base( /* isEnabled: */ true, logger, ThisClassName, service, config, httpMessageHandler)
 		{
 			_logger = logger?.Scoped(ThisClassName + (dbgName == null ? "" : $" (dbgName: `{dbgName}')"));
-			_payloadItemSerializer = new PayloadItemSerializer(config);
+			_payloadItemSerializer = new PayloadItemSerializer2(config);
 
 			_intakeV2EventsAbsoluteUrl = BackendCommUtils.ApmServerEndpoints.BuildIntakeV2EventsAbsoluteUrl(config.ServerUrls.First());
 

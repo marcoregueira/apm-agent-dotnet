@@ -237,7 +237,7 @@ namespace WMS_Infrastructure.Instrumentation
 				culprit: culprit,
 				id: null,
 				parentId: null,
-				timestamp: TimeUtils.ToTimestamp(customDate) ?? TimeUtils.TimestampNow(),
+				timestamp: TimeUtils2.ToTimestamp(customDate) ?? TimeUtils.TimestampNow(),
 				traceId: null,
 				transactionId: transactionId ?? GetCurrentTransaction()?.CurrentTransaction?.Id,
 				transaction: null,

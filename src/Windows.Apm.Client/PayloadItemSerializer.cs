@@ -3,11 +3,11 @@ using Newtonsoft.Json;
 
 namespace Elastic.Apm.Report.Serialization
 {
-	internal class PayloadItemSerializer
+	internal class PayloadItemSerializer2
 	{
 		private readonly JsonSerializerSettings _settings;
 
-		internal PayloadItemSerializer(IConfigurationReader configurationReader) =>
+		internal PayloadItemSerializer2(IConfigurationReader configurationReader) =>
 			_settings = new JsonSerializerSettings
 			{
 				ContractResolver = new ElasticApmContractResolver(configurationReader),
