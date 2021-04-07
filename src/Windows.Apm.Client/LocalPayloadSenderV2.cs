@@ -378,7 +378,7 @@ namespace Elastic.Apm.Report
 		}
 	}
 
-	internal class Metadata
+	internal class Metadata2
 	{
 		[JsonConverter(typeof(LabelsJsonConverter))]
 		public Dictionary<string, string> Labels { get; set; } = new Dictionary<string, string>();

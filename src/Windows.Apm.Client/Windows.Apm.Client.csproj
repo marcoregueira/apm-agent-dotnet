@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net461</TargetFrameworks>
+    <TargetFrameworks>net462</TargetFrameworks>
     <Configurations>Debug;Release;NuGet</Configurations>
     <PackageId>Ego.ApmAgent.Client</PackageId>
     <Authors>Marco Regueira</Authors>
